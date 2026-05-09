@@ -2,6 +2,7 @@ package com.codealpha.collegealert.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,54 +20,69 @@ import kotlinx.coroutines.delay
 fun SplashScreen(navController: NavHostController) {
 
     LaunchedEffect(Unit) {
-        delay(2800)
+        delay(3000) // 3 seconds
         navController.navigate("home") {
             popUpTo("splash") { inclusive = true }
         }
     }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0F172A)),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+            .background(Color(0xFF0A1428)), // Deep premium blue
+        contentAlignment = Alignment.Center
     ) {
-        Spacer(modifier = Modifier.height(80.dp))
-
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .background(Color(0xFFFF9800), shape = androidx.compose.foundation.shape.CircleShape),
-            contentAlignment = Alignment.Center
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "📢", fontSize = 48.sp)
+            // Logo Container - Matching your image
+            Box(
+                modifier = Modifier
+                    .size(160.dp)
+                    .background(
+                        color = Color(0xFFFF9800),
+                        shape = RoundedCornerShape(24.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "🎓",
+                    fontSize = 72.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(48.dp))
+
+            Text(
+                text = "Campus Sentinel",
+                fontSize = 42.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "ACADEMIC VIGILANCE & SAFETY",
+                fontSize = 15.sp,
+                letterSpacing = 4.sp,
+                color = Color(0xFF94A3B8),
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(120.dp))
+
+            // Bottom line with icons (matching design)
+            Row(
+                modifier = Modifier.fillMaxWidth(0.6f),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Text("🛡️", fontSize = 28.sp, color = Color(0xFF64748B))
+                Text("📢", fontSize = 28.sp, color = Color(0xFFFF9800))
+                Text("✅", fontSize = 28.sp, color = Color(0xFF64748B))
+            }
         }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Text(
-            text = "Campus Sentinel",
-            fontSize = 36.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            textAlign = TextAlign.Center
-        )
-
-        Text(
-            text = "ACADEMIC VIGILANCE & SAFETY",
-            fontSize = 14.sp,
-            color = Color(0xFF94A3B8),
-            letterSpacing = 3.sp,
-            modifier = Modifier.padding(top = 8.dp)
-        )
-
-        Spacer(modifier = Modifier.height(100.dp))
-
-        Text(
-            text = "Stay Informed • Stay Safe",
-            fontSize = 16.sp,
-            color = Color(0xFF64748B)
-        )
     }
 }
