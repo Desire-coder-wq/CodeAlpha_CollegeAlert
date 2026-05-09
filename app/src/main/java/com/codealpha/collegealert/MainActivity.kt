@@ -46,13 +46,25 @@ fun AppNavigation() {
                     navController.navigate("dashboard") {
                         popUpTo("home") { inclusive = true }
                     }
+                },
+                onSignUpClick = {
+                    navController.navigate("signup")
+                }
+            )
+        }
+        composable("signup") {
+            SignUpScreen(
+                onSignUpSuccess = {
+                    navController.navigate("login")
+                },
+                onBackToLogin = {
+                    navController.popBackStack()
                 }
             )
         }
         composable("dashboard") {
             DashboardScreen(
                 onEventClick = { event -> 
-                    // In a real app, we'd pass the event ID
                     navController.navigate("eventDetails") 
                 },
                 onProfileClick = { navController.navigate("profile") }
