@@ -10,8 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.codealpha.collegealert.ui.screens.HomeScreen
-import com.codealpha.collegealert.ui.screens.SplashScreen
+import com.codealpha.collegealert.ui.screens.*
 import com.codealpha.collegealert.ui.theme.CollegeAlertTheme
 
 class MainActivity : ComponentActivity() {
@@ -37,7 +36,37 @@ fun AppNavigation() {
             SplashScreen(navController = navController)
         }
         composable("home") {
-            HomeScreen()
+            HomeScreen(
+                onGetStartedClick = { navController.navigate("login") }
+            )
+        }
+        composable("login") {
+            LoginScreen(
+                onLoginSuccess = { 
+                    navController.navigate("dashboard") {
+                        popUpTo("home") { inclusive = true }
+                    }
+                }
+            )
+        }
+        composable("dashboard") {
+            DashboardScreen(
+                onEventClick = { event -> 
+                    // In a real app, we'd pass the event ID
+                    navController.navigate("eventDetails") 
+                },
+                onProfileClick = { navController.navigate("profile") }
+            )
+        }
+        composable("eventDetails") {
+            EventDetailsScreen(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+        composable("profile") {
+            ProfileScreen(
+                onBackClick = { navController.popBackStack() }
+            )
         }
     }
 }
