@@ -80,7 +80,7 @@ fun LoginScreen(
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("Email Address") },
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
                     isError = email.isNotEmpty() && !isEmailValid,
                     singleLine = true,
@@ -90,7 +90,8 @@ fun LoginScreen(
                         focusedLabelColor = Color(0xFF1A237E),
                         unfocusedLabelColor = Color.Gray,
                         focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White
+                        unfocusedContainerColor = Color.White,
+                        cursorColor = Color(0xFF1A237E)
                     )
                 )
 
@@ -101,7 +102,7 @@ fun LoginScreen(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("Enter Password") },
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
@@ -117,17 +118,13 @@ fun LoginScreen(
                         focusedLabelColor = Color(0xFF1A237E),
                         unfocusedLabelColor = Color.Gray,
                         focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White
+                        unfocusedContainerColor = Color.White,
+                        cursorColor = Color(0xFF1A237E)
                     )
                 )
 
                 if (error != null) {
-                    Text(
-                        text = error!!,
-                        color = Color.Red,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
+                    Text(text = error!!, color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp))
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
