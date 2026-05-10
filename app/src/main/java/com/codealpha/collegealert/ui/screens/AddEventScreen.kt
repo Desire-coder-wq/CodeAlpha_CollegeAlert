@@ -1,6 +1,9 @@
 package com.codealpha.collegealert.ui.screens
 
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,8 +11,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -35,9 +42,23 @@ fun AddEventScreen(
     var venue by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("") }
     
+    // Extensible Features State
+    var selectedUri by remember { mutableStateOf<Uri?>(null) }
+    var attachmentType by remember { mutableStateOf<String?>(null) }
+    var latitude by remember { mutableStateOf<Double?>(null) }
+    var longitude by remember { mutableStateOf<Double?>(null) }
+    
     val context = LocalContext.current
     val userProfile by authViewModel.userProfile
     val createSuccess by eventViewModel.createEventSuccess
+    val isLoading by eventViewModel.isLoading
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        selectedUri = uri
+        attachmentType = "image" // Defaulting to image for simplicity, can be dynamic
+    }
 
     val inputColors = OutlinedTextFieldDefaults.colors(
         focusedTextColor = Color(0xFF1A237E),
@@ -103,6 +124,40 @@ fun AddEventScreen(
                 shape = RoundedCornerShape(8.dp),
                 colors = inputColors
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text("EXTensible FEATURES", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Button(
+                    onClick = { launcher.launch("*/*") },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE8EAF6), contentColor = Color(0xFF1A237E)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Icon(Icons.Default.AttachFile, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(if (selectedUri != null) "File Selected" else "Add File")
+                }
+                
+                Button(
+                    onClick = { 
+                        // Mocking location selection
+                        latitude = 0.3476
+                        longitude = 32.5825
+                        Toast.makeText(context, "Location tagged!", Toast.LENGTH_SHORT).show()
+                    },
+                    modifier = Modifier.weight(1f),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE8EAF6), contentColor = Color(0xFF1A237E)),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Icon(Icons.Default.LocationOn, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(if (latitude != null) "Located" else "Tag Map")
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -179,16 +234,26 @@ fun AddEventScreen(
                             time = time,
                             venue = venue,
                             collegeId = userProfile?.collegeId ?: "General",
+                            latitude = latitude,
+                            longitude = longitude,
+                            attachmentType = attachmentType,
                             createdAt = Date()
                         )
-                        eventViewModel.createEvent(newEvent)
+                        eventViewModel.createEvent(newEvent, selectedUri)
                     }
                 },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A237E)),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
+                enabled = !isLoading
             ) {
-                Text("Publish Alert Now", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                if (isLoading) {
+                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                } else {
+                    Icon(Icons.Default.CloudUpload, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Publish Alert Now", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                }
             }
         }
     }
