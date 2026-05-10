@@ -14,15 +14,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(navController: NavHostController) {
 
     LaunchedEffect(Unit) {
-        delay(3000) // 3 seconds
-        navController.navigate("home") {
-            popUpTo("splash") { inclusive = true }
+        delay(3000) // 3 seconds delay for branding
+        
+        // SESSION CHECK: Check if a user is already signed in
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        
+        if (currentUser != null) {
+            // User is logged in, go straight to Dashboard
+            navController.navigate("main") {
+                popUpTo("splash") { inclusive = true }
+            }
+        } else {
+            // No user, show Onboarding
+            navController.navigate("home") {
+                popUpTo("splash") { inclusive = true }
+            }
         }
     }
 
@@ -36,7 +49,7 @@ fun SplashScreen(navController: NavHostController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo Container - Matching your image
+            // Logo Container
             Box(
                 modifier = Modifier
                     .size(160.dp)
@@ -74,14 +87,14 @@ fun SplashScreen(navController: NavHostController) {
 
             Spacer(modifier = Modifier.height(120.dp))
 
-            // Bottom line with icons (matching design)
+            // Bottom status indicators
             Row(
                 modifier = Modifier.fillMaxWidth(0.6f),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text("🛡️", fontSize = 28.sp, color = Color(0xFF64748B))
-                Text("📢", fontSize = 28.sp, color = Color(0xFFFF9800))
-                Text("✅", fontSize = 28.sp, color = Color(0xFF64748B))
+                Text("🛡️", fontSize = 28.sp)
+                Text("📢", fontSize = 28.sp)
+                Text("✅", fontSize = 28.sp)
             }
         }
     }
