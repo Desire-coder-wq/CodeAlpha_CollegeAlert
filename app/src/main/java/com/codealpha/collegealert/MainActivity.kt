@@ -32,18 +32,23 @@ class MainActivity : ComponentActivity() {
 fun AppNavigation() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "splash") {
+        // 1. Splash Screen
         composable("splash") {
             SplashScreen(navController = navController)
         }
+        
+        // 2. Onboarding Screen
         composable("home") {
             HomeScreen(
                 onGetStartedClick = { navController.navigate("login") }
             )
         }
+        
+        // 3. Login Screen
         composable("login") {
             LoginScreen(
                 onLoginSuccess = { 
-                    navController.navigate("dashboard") {
+                    navController.navigate("main") {
                         popUpTo("home") { inclusive = true }
                     }
                 },
@@ -52,6 +57,8 @@ fun AppNavigation() {
                 }
             )
         }
+        
+        // 4. Registration Screen
         composable("signup") {
             SignUpScreen(
                 onSignUpSuccess = {
@@ -62,21 +69,24 @@ fun AppNavigation() {
                 }
             )
         }
-        composable("dashboard") {
-            DashboardScreen(
+        
+        // 5. The Main App Hub (Dashboard + Bottom Nav)
+        composable("main") {
+            MainScreen(
                 onEventClick = { event -> 
                     navController.navigate("eventDetails") 
                 },
-                onProfileClick = { navController.navigate("profile") }
+                onLogout = {
+                    navController.navigate("login") {
+                        popUpTo("main") { inclusive = true }
+                    }
+                }
             )
         }
+        
+        // 6. Alert Details (Pushed on top)
         composable("eventDetails") {
             EventDetailsScreen(
-                onBackClick = { navController.popBackStack() }
-            )
-        }
-        composable("profile") {
-            ProfileScreen(
                 onBackClick = { navController.popBackStack() }
             )
         }

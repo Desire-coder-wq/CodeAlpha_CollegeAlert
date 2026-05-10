@@ -187,10 +187,20 @@ fun AlertCard(event: Event, onClick: () -> Unit) {
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.AccessTime, contentDescription = null, size = 14.dp, tint = Color.Gray)
+                    Icon(
+                        imageVector = Icons.Default.AccessTime, 
+                        contentDescription = null, 
+                        modifier = Modifier.size(14.dp), 
+                        tint = Color.Gray
+                    )
                     Text(" " + event.time, fontSize = 12.sp, color = Color.Gray)
                     Spacer(modifier = Modifier.width(16.dp))
-                    Icon(Icons.Default.LocationOn, contentDescription = null, size = 14.dp, tint = Color.Gray)
+                    Icon(
+                        imageVector = Icons.Default.LocationOn, 
+                        contentDescription = null, 
+                        modifier = Modifier.size(14.dp), 
+                        tint = Color.Gray
+                    )
                     Text(" " + event.venue, fontSize = 12.sp, color = Color.Gray)
                 }
             }
@@ -230,13 +240,4 @@ fun BottomNavigationBar(onProfileClick: () -> Unit) {
             onClick = onProfileClick
         )
     }
-}
-
-private fun Icon(imageVector: androidx.compose.ui.graphics.vector.ImageVector, contentDescription: String?, size: androidx.compose.ui.unit.Dp, tint: Color) {
-    Icon(
-        imageVector = imageVector,
-        contentDescription = contentDescription,
-        modifier = Modifier.size(size),
-        tint = tint
-    )
 }

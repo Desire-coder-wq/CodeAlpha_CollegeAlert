@@ -1,5 +1,6 @@
 package com.codealpha.collegealert.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -10,18 +11,27 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.codealpha.collegealert.viewmodel.AuthViewModel
 
 @Composable
-fun SignUpScreen(onSignUpSuccess: () -> Unit, onBackToLogin: () -> Unit) {
+fun SignUpScreen(
+    onSignUpSuccess: () -> Unit,
+    onBackToLogin: () -> Unit,
+    viewModel: AuthViewModel = viewModel()
+) {
     var fullName by remember { mutableStateOf("") }
-    var universityId by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    
+    val context = LocalContext.current
+    val isLoading by viewModel.isLoading
+    val error by viewModel.error
 
     Column(
         modifier = Modifier
@@ -33,7 +43,6 @@ fun SignUpScreen(onSignUpSuccess: () -> Unit, onBackToLogin: () -> Unit) {
     ) {
         Spacer(modifier = Modifier.height(40.dp))
 
-        // App Logo
         Surface(
             modifier = Modifier.size(64.dp),
             shape = RoundedCornerShape(12.dp),
@@ -63,7 +72,6 @@ fun SignUpScreen(onSignUpSuccess: () -> Unit, onBackToLogin: () -> Unit) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Sign Up Card
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -76,17 +84,6 @@ fun SignUpScreen(onSignUpSuccess: () -> Unit, onBackToLogin: () -> Unit) {
                     value = fullName,
                     onValueChange = { fullName = it },
                     placeholder = { Text("Alex Rivers") },
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    shape = RoundedCornerShape(8.dp)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text("UNIVERSITY ID", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
-                OutlinedTextField(
-                    value = universityId,
-                    onValueChange = { universityId = it },
-                    placeholder = { Text("e.g. 2024-8832") },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                     shape = RoundedCornerShape(8.dp)
                 )
@@ -114,24 +111,44 @@ fun SignUpScreen(onSignUpSuccess: () -> Unit, onBackToLogin: () -> Unit) {
                     shape = RoundedCornerShape(8.dp)
                 )
 
+                if (error != null) {
+                    Text(
+                        text = error!!,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
-                    onClick = onSignUpSuccess,
+                    onClick = { 
+                        if (email.isNotEmpty() && password.isNotEmpty() && fullName.isNotEmpty()) {
+                            viewModel.signUp(email, password, onSignUpSuccess)
+                        } else {
+                            Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth().height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF000051)),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    enabled = !isLoading
                 ) {
-                    Text("CREATE ACCOUNT  →", fontWeight = FontWeight.Bold)
+                    if (isLoading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                    } else {
+                        Text("CREATE ACCOUNT  →", fontWeight = FontWeight.Bold)
+                    }
                 }
             }
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        Row {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Already have an account? ", color = Color.Gray)
-            TextButton(onClick = onBackToLogin, contentPadding = PaddingValues(0.dp)) {
+            TextButton(onClick = onBackToLogin) {
                 Text("Sign In", color = Color(0xFF1A237E), fontWeight = FontWeight.Bold)
             }
         }
