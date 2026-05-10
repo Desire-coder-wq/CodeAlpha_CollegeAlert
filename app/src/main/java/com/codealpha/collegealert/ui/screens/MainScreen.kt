@@ -80,18 +80,17 @@ fun MainScreen(
         ) {
             composable(Screen.Home.route) {
                 DashboardScreen(
-                    onEventClick = onEventClick,
-                    onProfileClick = { navController.navigate(Screen.Profile.route) }
+                    onEventClick = onEventClick
                 )
             }
             composable(Screen.Alerts.route) {
                 AlertsScreen(onEventClick = onEventClick)
             }
             composable(Screen.Discover.route) {
-                DiscoverScreen()
+                ExploreScreen() // Using your premium Explore UI
             }
             composable(Screen.Profile.route) {
-                ProfileScreen(onBackClick = { navController.popBackStack() })
+                ProfileScreen(onLogout = onLogout)
             }
         }
     }
