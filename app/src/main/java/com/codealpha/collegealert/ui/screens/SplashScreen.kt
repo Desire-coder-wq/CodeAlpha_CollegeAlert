@@ -8,6 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -21,41 +24,58 @@ import kotlinx.coroutines.delay
 fun SplashScreen(navController: NavHostController) {
 
     LaunchedEffect(Unit) {
-        delay(3000) // 3 seconds delay for branding
-        
-        // SESSION CHECK: Check if a user is already signed in
+        delay(3000)
         val currentUser = FirebaseAuth.getInstance().currentUser
-        
         if (currentUser != null) {
-            // User is logged in, go straight to Dashboard
             navController.navigate("main") {
                 popUpTo("splash") { inclusive = true }
             }
         } else {
-            // No user, show Onboarding
             navController.navigate("home") {
                 popUpTo("splash") { inclusive = true }
             }
         }
     }
 
+    // Premium gradient background (deep navy to rich indigo)
+    val gradientBrush = Brush.verticalGradient(
+        colors = listOf(
+            Color(0xFF0A1428),  // Deep navy top
+            Color(0xFF1A1A3A),  // Mid indigo
+            Color(0xFF0D1B2A)   // Dark blue bottom
+        ),
+        startY = 0.0f,
+        endY = Float.POSITIVE_INFINITY
+    )
+
+    // Subtle accent gradient for brand glow
+    val accentGlow = Brush.radialGradient(
+        colors = listOf(
+            Color(0x33FF9800),  // Transparent orange glow
+            Color(0x000A1428)    // Fully transparent
+        ),
+        center = Offset(500f, 300f),
+        radius = 800f
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0A1428)), // Deep premium blue
+            .background(gradientBrush)
+            .background(accentGlow),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo Container
+            // Logo Container with gradient border effect
             Box(
                 modifier = Modifier
                     .size(160.dp)
                     .background(
                         color = Color(0xFFFF9800),
-                        shape = RoundedCornerShape(24.dp)
+                        shape = RoundedCornerShape(28.dp)
                     ),
                 contentAlignment = Alignment.Center
             ) {
@@ -65,36 +85,55 @@ fun SplashScreen(navController: NavHostController) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
+            // Main Title with subtle shadow
             Text(
                 text = "Campus Sentinel",
-                fontSize = 42.sp,
+                fontSize = 44.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                letterSpacing = 1.sp
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
+            // Subtitle with divider lines effect
             Text(
                 text = "ACADEMIC VIGILANCE & SAFETY",
-                fontSize = 15.sp,
+                fontSize = 14.sp,
                 letterSpacing = 4.sp,
-                color = Color(0xFF94A3B8),
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFFFF9800).copy(alpha = 0.9f),
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(120.dp))
+            Spacer(modifier = Modifier.height(100.dp))
 
-            // Bottom status indicators
-            Row(
-                modifier = Modifier.fillMaxWidth(0.6f),
-                horizontalArrangement = Arrangement.SpaceEvenly
+            // Footer Section
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text("🛡️", fontSize = 28.sp)
-                Text("📢", fontSize = 28.sp)
-                Text("✅", fontSize = 28.sp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.5f),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Text("🛡️", fontSize = 24.sp)
+                    Text("📢", fontSize = 24.sp)
+                    Text("✅", fontSize = 24.sp)
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(
+                    text = "© 2026 University Security Division",
+                    fontSize = 11.sp,
+                    letterSpacing = 1.sp,
+                    color = Color(0xFF5A6B8A),
+                    textAlign = TextAlign.Center
+                )
             }
         }
     }

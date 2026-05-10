@@ -32,49 +32,36 @@ fun DashboardScreen(
     val isLoading by eventViewModel.isLoading
     val userProfile by authViewModel.userProfile
     
-    var searchQuery by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("All") }
     val categories = listOf("All", "Notice", "Seminar", "Exam", "Fest")
 
+    // Fetch events when the profile (specifically collegeId) is available
     LaunchedEffect(userProfile) {
         userProfile?.collegeId?.let { id ->
             eventViewModel.fetchEvents(id)
         }
     }
 
-    val filteredEvents = events.filter { event ->
-        val matchesSearch = event.title.contains(searchQuery, ignoreCase = true) || 
-                          event.description.contains(searchQuery, ignoreCase = true)
-        val matchesCategory = selectedCategory == "All" || event.category.equals(selectedCategory, ignoreCase = true)
-        matchesSearch && matchesCategory
+    // Filter events based on selected category
+    val filteredEvents = if (selectedCategory == "All") {
+        events
+    } else {
+        events.filter { it.category.equals(selectedCategory, ignoreCase = true) }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { 
-                    OutlinedTextField(
-                        value = searchQuery,
-                        onValueChange = { searchQuery = it },
-                        placeholder = { Text("Search campus alerts...", fontSize = 14.sp, color = Color.Gray) },
-                        modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
-                        shape = RoundedCornerShape(24.dp),
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color(0xFF1A237E)) },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color(0xFF1A237E),
-                            unfocusedTextColor = Color(0xFF1A237E),
-                            focusedContainerColor = Color.White,
-                            unfocusedContainerColor = Color.White,
-                            focusedBorderColor = Color.Transparent,
-                            unfocusedBorderColor = Color.Transparent,
-                            cursorColor = Color(0xFF1A237E)
-                        ),
-                        singleLine = true
-                    )
+                title = { Text("Campus Sentinel", fontWeight = FontWeight.Bold) },
+                actions = {
+                    IconButton(onClick = { /* Menu */ }) {
+                        Icon(Icons.Default.Menu, contentDescription = "Menu")
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF1A237E),
-                    titleContentColor = Color.White
+                    titleContentColor = Color.White,
+                    actionIconContentColor = Color.White
                 )
             )
         }
@@ -94,13 +81,13 @@ fun DashboardScreen(
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Welcome back,\n${userProfile?.fullName?.split(" ")?.get(0) ?: "Student"}",
+                        text = "Welcome back,\n${userProfile?.fullName ?: "Student"}",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF1A237E)
                     )
                     Text(
-                        text = "Your campus is monitored. Stay informed about updates at ${userProfile?.collegeId ?: "your institution"}.",
+                        text = "Your campus is monitored. Stay informed about updates at ${userProfile?.collegeId?.ifEmpty { "your institution" } ?: "your institution"}.",
                         fontSize = 14.sp,
                         color = Color.Gray,
                         modifier = Modifier.padding(vertical = 8.dp)
@@ -108,6 +95,7 @@ fun DashboardScreen(
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
+                    // Security Status Card
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(containerColor = Color(0xFFFF9800)),
@@ -123,11 +111,24 @@ fun DashboardScreen(
                                 Text("Security Status", color = Color.White, fontSize = 12.sp)
                                 Text("High Vigilance", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                             }
+                            Surface(
+                                color = Color(0xFFE65100),
+                                shape = RoundedCornerShape(4.dp)
+                            ) {
+                                Text(
+                                    "ACTIVE",
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                    color = Color.White,
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                         }
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
 
+                    // Real Functional Filters
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -151,7 +152,7 @@ fun DashboardScreen(
                         Text("High-Priority Alerts", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color(0xFF1A237E))
                         Spacer(modifier = Modifier.weight(1f))
                         if (filteredEvents.isNotEmpty()) {
-                            Text("🚨 Live", color = Color.Red, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("🚨 Live Updates", color = Color.Red, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                     Spacer(modifier = Modifier.height(12.dp))
@@ -161,7 +162,7 @@ fun DashboardScreen(
                             modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("No alerts found matching your criteria.", color = Color.Gray)
+                            Text("No alerts found for $selectedCategory.", color = Color.Gray)
                         }
                     }
                 }

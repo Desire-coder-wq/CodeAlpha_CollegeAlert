@@ -7,7 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ChevronRight
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -167,6 +167,6 @@ fun SettingItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: St
             Text(text = title, fontWeight = FontWeight.Medium, color = Color(0xFF1A237E))
             Text(text = subtitle, fontSize = 12.sp, color = Color.Gray)
         }
-        Icon(Icons.AutoMirrored.Filled.ChevronRight, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(18.dp))
+        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(18.dp))
     }
 }

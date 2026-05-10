@@ -38,6 +38,17 @@ fun LoginScreen(
     val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     val isPasswordValid = password.length >= 6
 
+    val textFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = Color(0xFF1A237E),
+        unfocusedTextColor = Color(0xFF1A237E),
+        focusedContainerColor = Color.White,
+        unfocusedContainerColor = Color.White,
+        cursorColor = Color(0xFF1A237E),
+        focusedBorderColor = Color(0xFF1A237E),
+        unfocusedBorderColor = Color.LightGray,
+        errorTextColor = Color.Red
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -79,20 +90,13 @@ fun LoginScreen(
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    label = { Text("Email Address") },
+                    // CHANGED: Using placeholder instead of label so it disappears when typing
+                    placeholder = { Text("alex@university.edu", color = Color.LightGray) },
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
                     isError = email.isNotEmpty() && !isEmailValid,
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color(0xFF1A237E),
-                        unfocusedTextColor = Color(0xFF1A237E),
-                        focusedLabelColor = Color(0xFF1A237E),
-                        unfocusedLabelColor = Color.Gray,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        cursorColor = Color(0xFF1A237E)
-                    )
+                    colors = textFieldColors
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -101,7 +105,8 @@ fun LoginScreen(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Enter Password") },
+                    // CHANGED: Using placeholder instead of label
+                    placeholder = { Text("••••••••", color = Color.LightGray) },
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -112,15 +117,7 @@ fun LoginScreen(
                         }
                     },
                     singleLine = true,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color(0xFF1A237E),
-                        unfocusedTextColor = Color(0xFF1A237E),
-                        focusedLabelColor = Color(0xFF1A237E),
-                        unfocusedLabelColor = Color.Gray,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
-                        cursorColor = Color(0xFF1A237E)
-                    )
+                    colors = textFieldColors
                 )
 
                 if (error != null) {
