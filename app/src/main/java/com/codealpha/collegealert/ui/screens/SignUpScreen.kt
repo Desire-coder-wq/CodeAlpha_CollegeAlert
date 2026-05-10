@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,10 +33,17 @@ fun SignUpScreen(
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
     
     val context = LocalContext.current
     val isLoading by viewModel.isLoading
     val error by viewModel.error
+
+    // Real-time Validations
+    val isFullNameValid = fullName.isNotBlank()
+    val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    val isPasswordValid = password.length >= 6
+    val canSubmit = isFullNameValid && isEmailValid && isPasswordValid
 
     Column(
         modifier = Modifier
@@ -44,6 +55,7 @@ fun SignUpScreen(
     ) {
         Spacer(modifier = Modifier.height(40.dp))
 
+        // App Logo
         Surface(
             modifier = Modifier.size(64.dp),
             shape = RoundedCornerShape(12.dp),
@@ -73,6 +85,7 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        // Sign Up Card
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -86,7 +99,9 @@ fun SignUpScreen(
                     onValueChange = { fullName = it },
                     placeholder = { Text("Alex Rivers") },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    isError = fullName.isNotEmpty() && !isFullNameValid,
+                    singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -97,8 +112,13 @@ fun SignUpScreen(
                     onValueChange = { email = it },
                     placeholder = { Text("alex@university.edu") },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    isError = email.isNotEmpty() && !isEmailValid,
+                    singleLine = true
                 )
+                if (email.isNotEmpty() && !isEmailValid) {
+                    Text("Invalid email format", color = Color.Red, fontSize = 11.sp)
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -108,9 +128,20 @@ fun SignUpScreen(
                     onValueChange = { password = it },
                     placeholder = { Text("••••••••") },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    visualTransformation = PasswordVisualTransformation(),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(imageVector = image, contentDescription = null, tint = Color(0xFF1A237E))
+                        }
+                    },
+                    isError = password.isNotEmpty() && !isPasswordValid,
+                    singleLine = true
                 )
+                if (password.isNotEmpty() && !isPasswordValid) {
+                    Text("Password must be at least 6 characters", color = Color.Red, fontSize = 11.sp)
+                }
 
                 if (error != null) {
                     Text(
@@ -125,16 +156,16 @@ fun SignUpScreen(
 
                 Button(
                     onClick = { 
-                        if (email.isNotEmpty() && password.isNotEmpty() && fullName.isNotEmpty()) {
+                        if (canSubmit) {
                             viewModel.signUp(email, password, onSignUpSuccess)
                         } else {
-                            Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Please complete the form correctly", Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF000051)),
                     shape = RoundedCornerShape(8.dp),
-                    enabled = !isLoading
+                    enabled = !isLoading && canSubmit
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
@@ -149,7 +180,7 @@ fun SignUpScreen(
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Already have an account? ", color = Color.Gray)
-            TextButton(onClick = onBackToLogin) {
+            TextButton(onClick = onBackToLogin, contentPadding = PaddingValues(0.dp)) {
                 Text("Sign In", color = Color(0xFF1A237E), fontWeight = FontWeight.Bold)
             }
         }
