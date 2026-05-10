@@ -7,6 +7,7 @@ data class User(
     val universityId: String = "",
     val collegeId: String = "", // Used to filter alerts for specific schools
     val profilePictureUrl: String? = null,
+    val isAdmin: Boolean = false, // Added to differentiate between Admin and Student
     val examsNotificationsEnabled: Boolean = true,
     val festsNotificationsEnabled: Boolean = true,
     val securityAlertsEnabled: Boolean = true
