@@ -4,6 +4,9 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -12,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -23,11 +27,17 @@ fun LoginScreen(
     onSignUpClick: () -> Unit,
     viewModel: AuthViewModel = viewModel()
 ) {
-    var email by remember { mutableStateOf("") } // Firebase Auth uses email
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+    
     val context = LocalContext.current
     val isLoading by viewModel.isLoading
     val error by viewModel.error
+
+    // Simple validation logic
+    val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    val isPasswordValid = password.length >= 6
 
     Column(
         modifier = Modifier
@@ -72,8 +82,13 @@ fun LoginScreen(
                     onValueChange = { email = it },
                     placeholder = { Text("alex@university.edu") },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    isError = email.isNotEmpty() && !isEmailValid,
+                    singleLine = true
                 )
+                if (email.isNotEmpty() && !isEmailValid) {
+                    Text("Enter a valid email address", color = Color.Red, fontSize = 11.sp)
+                }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -83,8 +98,15 @@ fun LoginScreen(
                     onValueChange = { password = it },
                     placeholder = { Text("••••••••") },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    visualTransformation = PasswordVisualTransformation(),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(imageVector = image, contentDescription = null, tint = Color(0xFF1A237E))
+                        }
+                    },
+                    singleLine = true
                 )
 
                 if (error != null) {
@@ -100,16 +122,16 @@ fun LoginScreen(
 
                 Button(
                     onClick = { 
-                        if (email.isNotEmpty() && password.isNotEmpty()) {
+                        if (isEmailValid && isPasswordValid) {
                             viewModel.signIn(email, password, onLoginSuccess)
                         } else {
-                            Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Please check your credentials", Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF000051)),
                     shape = RoundedCornerShape(8.dp),
-                    enabled = !isLoading
+                    enabled = !isLoading && isEmailValid && isPasswordValid
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))

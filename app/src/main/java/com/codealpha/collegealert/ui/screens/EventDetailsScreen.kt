@@ -2,9 +2,7 @@ package com.codealpha.collegealert.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
@@ -46,7 +44,6 @@ fun EventDetailsScreen(
                 .fillMaxSize()
                 .background(Color(0xFFF8F9FB))
                 .padding(padding)
-                .verticalScroll(rememberScrollState())
         ) {
             // Hero Image placeholder
             Box(
@@ -102,7 +99,7 @@ fun EventDetailsScreen(
                 // Info Cards
                 InfoRow(icon = Icons.Default.CalendarToday, label = "Date", value = "Oct 15, 2024")
                 InfoRow(icon = Icons.Default.AccessTime, label = "Time", value = "10:00 AM - 4:00 PM")
-                InfoRow(icon = Icons.Default.LocationOn, label = "Venue", value = "Main Auditorium, Block 4")
+                InfoRow(icon = Icons.Default.LocationOn, label = "Venue", value = "Main Auditorium, Engineering Block 4")
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -115,7 +112,7 @@ fun EventDetailsScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Join us for the most anticipated annual technology gathering. Tech Fest 2024 brings together students, industry leaders, and innovators for a day of demonstrations and coding marathons.",
+                    text = "Join us for the most anticipated annual technology gathering of the season. Tech Fest 2024 brings together students, industry leaders, and innovators for a day of groundbreaking demonstrations, coding marathons, and keynote speeches.",
                     fontSize = 15.sp,
                     lineHeight = 24.sp,
                     color = Color(0xFF455A64)
@@ -158,7 +155,7 @@ fun EventDetailsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 SpeakerItem("Dr. Sarah Chen", "CTO, Neural Dynamics")
-                SpeakerItem("Prof. James Miller", "Dept. Head, Computer Science")
+                SpeakerItem("Prof. James Miller", "Dept. Head, Quantum Computing")
 
                 Spacer(modifier = Modifier.height(32.dp))
 
@@ -216,6 +213,7 @@ fun SpeakerItem(name: String, title: String) {
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Profile picture placeholder
         Box(
             modifier = Modifier
                 .size(48.dp)
