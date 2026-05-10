@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -88,7 +89,7 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    AssistChip(onClick = {}, label = { Text("ID: ${userProfile?.universityId?.ifEmpty { "N/A" }}") })
+                    AssistChip(onClick = {}, label = { Text("ID: ${userProfile?.universityId?.ifEmpty { "N/A" } ?: "N/A"}") })
                     AssistChip(onClick = {}, label = { Text(userProfile?.collegeId ?: "No College") })
                 }
             }
