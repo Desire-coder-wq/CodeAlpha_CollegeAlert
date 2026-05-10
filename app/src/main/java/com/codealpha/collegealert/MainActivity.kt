@@ -83,6 +83,9 @@ fun AppNavigation() {
                     navController.navigate("splash") {
                         popUpTo(0) { inclusive = true }
                     }
+                },
+                onAddEventClick = {
+                    navController.navigate("addEvent")
                 }
             )
         }
@@ -90,6 +93,13 @@ fun AppNavigation() {
         // 6. Alert Details
         composable("eventDetails") {
             EventDetailsScreen(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        // 7. Add Event Screen (Admin Mode)
+        composable("addEvent") {
+            AddEventScreen(
                 onBackClick = { navController.popBackStack() }
             )
         }
