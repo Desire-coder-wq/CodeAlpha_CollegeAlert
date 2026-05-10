@@ -36,14 +36,12 @@ fun DashboardScreen(
     var selectedCategory by remember { mutableStateOf("All") }
     val categories = listOf("All", "Notice", "Seminar", "Exam", "Fest")
 
-    // Fetch events when the profile (specifically collegeId) is available
     LaunchedEffect(userProfile) {
         userProfile?.collegeId?.let { id ->
             eventViewModel.fetchEvents(id)
         }
     }
 
-    // Filter events based on search query and selected category
     val filteredEvents = events.filter { event ->
         val matchesSearch = event.title.contains(searchQuery, ignoreCase = true) || 
                           event.description.contains(searchQuery, ignoreCase = true)
@@ -58,15 +56,18 @@ fun DashboardScreen(
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
-                        placeholder = { Text("Search campus alerts...", fontSize = 14.sp) },
+                        placeholder = { Text("Search campus alerts...", fontSize = 14.sp, color = Color.Gray) },
                         modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
                         shape = RoundedCornerShape(24.dp),
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color(0xFF1A237E)) },
                         colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color(0xFF1A237E),
+                            unfocusedTextColor = Color(0xFF1A237E),
                             focusedContainerColor = Color.White,
                             unfocusedContainerColor = Color.White,
                             focusedBorderColor = Color.Transparent,
-                            unfocusedBorderColor = Color.Transparent
+                            unfocusedBorderColor = Color.Transparent,
+                            cursorColor = Color(0xFF1A237E)
                         ),
                         singleLine = true
                     )
@@ -107,7 +108,6 @@ fun DashboardScreen(
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
-                    // Security Status Card
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(containerColor = Color(0xFFFF9800)),
@@ -128,7 +128,6 @@ fun DashboardScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Real Functional Filters
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)

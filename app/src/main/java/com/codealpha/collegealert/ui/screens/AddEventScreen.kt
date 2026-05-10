@@ -39,6 +39,15 @@ fun AddEventScreen(
     val userProfile by authViewModel.userProfile
     val createSuccess by eventViewModel.createEventSuccess
 
+    val inputColors = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = Color(0xFF1A237E),
+        unfocusedTextColor = Color(0xFF1A237E),
+        focusedLabelColor = Color(0xFF1A237E),
+        unfocusedLabelColor = Color.Gray,
+        focusedContainerColor = Color.White,
+        unfocusedContainerColor = Color.White
+    )
+
     LaunchedEffect(createSuccess) {
         if (createSuccess) {
             Toast.makeText(context, "Alert Published!", Toast.LENGTH_SHORT).show()
@@ -79,7 +88,9 @@ fun AddEventScreen(
                 onValueChange = { title = it },
                 label = { Text("Event Title") },
                 modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(8.dp),
+                colors = inputColors,
+                singleLine = true
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -89,7 +100,8 @@ fun AddEventScreen(
                 onValueChange = { description = it },
                 label = { Text("Full Description") },
                 modifier = Modifier.fillMaxWidth().height(120.dp),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(8.dp),
+                colors = inputColors
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -107,17 +119,20 @@ fun AddEventScreen(
                     value = category,
                     onValueChange = {},
                     readOnly = true,
+                    label = { Text("Select Type") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor().fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp)
+                    modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true).fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = inputColors
                 )
                 ExposedDropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.background(Color.White)
                 ) {
                     categories.forEach { selectionOption ->
                         DropdownMenuItem(
-                            text = { Text(selectionOption) },
+                            text = { Text(selectionOption, color = Color(0xFF1A237E)) },
                             onClick = {
                                 category = selectionOption
                                 expanded = false
@@ -133,16 +148,20 @@ fun AddEventScreen(
                 OutlinedTextField(
                     value = time,
                     onValueChange = { time = it },
-                    label = { Text("Time (e.g. 10 AM)") },
+                    label = { Text("Time") },
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    colors = inputColors,
+                    singleLine = true
                 )
                 OutlinedTextField(
                     value = venue,
                     onValueChange = { venue = it },
                     label = { Text("Venue") },
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
+                    colors = inputColors,
+                    singleLine = true
                 )
             }
 
@@ -159,7 +178,7 @@ fun AddEventScreen(
                             category = category,
                             time = time,
                             venue = venue,
-                            collegeId = userProfile?.collegeId ?: "",
+                            collegeId = userProfile?.collegeId ?: "General",
                             createdAt = Date()
                         )
                         eventViewModel.createEvent(newEvent)

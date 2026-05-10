@@ -46,15 +46,18 @@ fun AlertsScreen(
                     OutlinedTextField(
                         value = searchQuery,
                         onValueChange = { searchQuery = it },
-                        placeholder = { Text("Search stream...", fontSize = 14.sp) },
+                        placeholder = { Text("Search stream...", fontSize = 14.sp, color = Color.Gray) },
                         modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
                         shape = RoundedCornerShape(24.dp),
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color(0xFF1A237E)) },
                         colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color(0xFF1A237E),
+                            unfocusedTextColor = Color(0xFF1A237E),
                             focusedContainerColor = Color.White,
                             unfocusedContainerColor = Color.White,
                             focusedBorderColor = Color.Transparent,
-                            unfocusedBorderColor = Color.Transparent
+                            unfocusedBorderColor = Color.Transparent,
+                            cursorColor = Color(0xFF1A237E)
                         ),
                         singleLine = true
                     )
