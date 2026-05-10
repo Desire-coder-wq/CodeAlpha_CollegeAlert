@@ -32,23 +32,24 @@ class MainActivity : ComponentActivity() {
 fun AppNavigation() {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "splash") {
-        // 1. Splash Screen
+        // 1. Splash Screen - Entry point
         composable("splash") {
             SplashScreen(navController = navController)
         }
-        
+
         // 2. Onboarding Screen
         composable("home") {
             HomeScreen(
                 onGetStartedClick = { navController.navigate("login") }
             )
         }
-        
+
         // 3. Login Screen
         composable("login") {
             LoginScreen(
-                onLoginSuccess = { 
+                onLoginSuccess = {
                     navController.navigate("main") {
+                        // Clear history so you can't go back to Login/Home
                         popUpTo("home") { inclusive = true }
                     }
                 },
@@ -57,7 +58,7 @@ fun AppNavigation() {
                 }
             )
         }
-        
+
         // 4. Registration Screen
         composable("signup") {
             SignUpScreen(
@@ -69,23 +70,24 @@ fun AppNavigation() {
                 }
             )
         }
-        
-        // 5. The Main App Hub (Dashboard + Bottom Nav)
+
+        // 5. The Main App Hub (Dashboard + Tabs)
         composable("main") {
             MainScreen(
-                onEventClick = { event -> 
-                    navController.navigate("eventDetails") 
+                onEventClick = { event ->
+                    // Navigate to details when an event is clicked
+                    navController.navigate("eventDetails")
                 },
                 onLogout = {
-                    // Navigate back to the onboarding screen on logout
-                    navController.navigate("home") {
-                        popUpTo("main") { inclusive = true }
+                    // CRITICAL: Clear all history and restart at Splash
+                    navController.navigate("splash") {
+                        popUpTo(0) { inclusive = true }
                     }
                 }
             )
         }
-        
-        // 6. Alert Details (Pushed on top)
+
+        // 6. Alert Details
         composable("eventDetails") {
             EventDetailsScreen(
                 onBackClick = { navController.popBackStack() }
