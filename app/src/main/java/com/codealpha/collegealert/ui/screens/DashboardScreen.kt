@@ -62,10 +62,11 @@ fun DashboardScreen(
                         modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
                         shape = RoundedCornerShape(24.dp),
                         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.White,
-                            unfocusedBorderColor = Color.Transparent,
-                            focusedBorderColor = Color.Transparent
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            focusedBorderColor = Color.Transparent,
+                            unfocusedBorderColor = Color.Transparent
                         ),
                         singleLine = true
                     )
