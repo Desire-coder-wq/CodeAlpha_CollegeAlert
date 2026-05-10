@@ -14,14 +14,14 @@ class EventViewModel(private val repository: EventRepository = EventRepository()
     private val _events = mutableStateOf<List<Event>>(emptyList())
     val events: State<List<Event>> = _events
 
+    private val _selectedEvent = mutableStateOf<Event?>(null)
+    val selectedEvent: State<Event?> = _selectedEvent
+
     private val _isLoading = mutableStateOf(false)
     val isLoading: State<Boolean> = _isLoading
 
     private val _createEventSuccess = mutableStateOf(false)
     val createEventSuccess: State<Boolean> = _createEventSuccess
-
-    private val _uploadProgress = mutableStateOf<Float?>(null)
-    val uploadProgress: State<Float?> = _uploadProgress
 
     fun fetchEvents(collegeId: String) {
         viewModelScope.launch {
@@ -33,19 +33,21 @@ class EventViewModel(private val repository: EventRepository = EventRepository()
         }
     }
 
+    fun selectEvent(event: Event) {
+        _selectedEvent.value = event
+    }
+
     fun createEvent(event: Event, attachmentUri: Uri? = null) {
         viewModelScope.launch {
             _isLoading.value = true
             
             var finalEvent = event
             
-            // If there's an attachment, upload it first
             if (attachmentUri != null) {
                 val uploadResult = repository.uploadAttachment(attachmentUri, event.attachmentType ?: "file")
                 uploadResult.onSuccess { url ->
                     finalEvent = event.copy(attachmentUrl = url)
                 }.onFailure {
-                    // Handle error if needed
                     _isLoading.value = false
                     return@launch
                 }

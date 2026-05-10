@@ -50,11 +50,11 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
         }
     }
 
-    fun signUp(fullName: String, email: String, pass: String, collegeId: String, onSuccess: () -> Unit) {
+    fun signUp(fullName: String, email: String, pass: String, collegeId: String, isAdmin: Boolean, onSuccess: () -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
-            val result = repository.signUp(fullName, email, pass, collegeId)
+            val result = repository.signUp(fullName, email, pass, collegeId, isAdmin)
             result.onSuccess { firebaseUser ->
                 _user.value = firebaseUser
                 firebaseUser?.let { fetchUserProfile(it.uid) }

@@ -22,7 +22,7 @@ class AuthRepository(
         }
     }
 
-    suspend fun signUp(fullName: String, email: String, pass: String, collegeId: String): Result<FirebaseUser?> {
+    suspend fun signUp(fullName: String, email: String, pass: String, collegeId: String, isAdmin: Boolean): Result<FirebaseUser?> {
         return try {
             val result = auth.createUserWithEmailAndPassword(email, pass).await()
             val firebaseUser = result.user
@@ -32,7 +32,8 @@ class AuthRepository(
                     uid = firebaseUser.uid,
                     fullName = fullName,
                     email = email,
-                    collegeId = collegeId
+                    collegeId = collegeId,
+                    isAdmin = isAdmin
                 )
                 db.collection("users").document(firebaseUser.uid).set(userProfile).await()
             }

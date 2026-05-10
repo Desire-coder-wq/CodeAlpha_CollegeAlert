@@ -3,6 +3,7 @@ package com.codealpha.collegealert.ui.screens
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.NotificationsNone
@@ -19,6 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.codealpha.collegealert.data.model.Event
+import com.codealpha.collegealert.viewmodel.AuthViewModel
 
 sealed class Screen(val route: String, val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
     object Home : Screen("dashboard_home", "Home", Icons.Default.GridView)
@@ -31,7 +33,9 @@ sealed class Screen(val route: String, val label: String, val icon: androidx.com
 fun MainScreen(
     onEventClick: (Event) -> Unit,
     onLogout: () -> Unit,
-    onAddEventClick: () -> Unit
+    onAddEventClick: () -> Unit,
+    onAdminDashboardClick: () -> Unit,
+    authViewModel: AuthViewModel
 ) {
     val navController = rememberNavController()
     val items = listOf(
@@ -40,15 +44,29 @@ fun MainScreen(
         Screen.Discover,
         Screen.Profile
     )
+    
+    val userProfile by authViewModel.userProfile
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddEventClick,
-                containerColor = Color(0xFFFF9800),
-                contentColor = Color.White
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Alert")
+            if (userProfile?.isAdmin == true) {
+                Column {
+                    FloatingActionButton(
+                        onClick = onAdminDashboardClick,
+                        containerColor = Color(0xFF1A237E),
+                        contentColor = Color.White,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    ) {
+                        Icon(Icons.Default.Dashboard, contentDescription = "Admin Panel")
+                    }
+                    FloatingActionButton(
+                        onClick = onAddEventClick,
+                        containerColor = Color(0xFFFF9800),
+                        contentColor = Color.White
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Add Alert")
+                    }
+                }
             }
         },
         bottomBar = {
@@ -91,17 +109,24 @@ fun MainScreen(
         ) {
             composable(Screen.Home.route) {
                 DashboardScreen(
-                    onEventClick = onEventClick
+                    onEventClick = onEventClick,
+                    authViewModel = authViewModel
                 )
             }
             composable(Screen.Alerts.route) {
-                AlertsScreen(onEventClick = onEventClick)
+                AlertsScreen(
+                    onEventClick = onEventClick,
+                    authViewModel = authViewModel
+                )
             }
             composable(Screen.Discover.route) {
                 ExploreScreen()
             }
             composable(Screen.Profile.route) {
-                ProfileScreen(onLogout = onLogout)
+                ProfileScreen(
+                    onLogout = onLogout,
+                    viewModel = authViewModel
+                )
             }
         }
     }
