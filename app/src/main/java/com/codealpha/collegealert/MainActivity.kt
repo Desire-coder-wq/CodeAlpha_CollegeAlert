@@ -77,7 +77,8 @@ fun AppNavigation() {
                     navController.navigate("eventDetails") 
                 },
                 onLogout = {
-                    navController.navigate("login") {
+                    // Navigate back to the onboarding screen on logout
+                    navController.navigate("home") {
                         popUpTo("main") { inclusive = true }
                     }
                 }
