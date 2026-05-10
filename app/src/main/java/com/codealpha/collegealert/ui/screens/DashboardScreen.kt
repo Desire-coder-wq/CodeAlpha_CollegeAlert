@@ -35,14 +35,19 @@ fun DashboardScreen(
     var selectedCategory by remember { mutableStateOf("All") }
     val categories = listOf("All", "Notice", "Seminar", "Exam", "Fest")
 
+    // Fetch events based on college ID
     LaunchedEffect(userProfile) {
         userProfile?.collegeId?.let { id ->
-            eventViewModel.fetchEvents(id)
+            if (id.isNotEmpty()) {
+                eventViewModel.fetchEvents(id)
+            }
         }
     }
 
-    val filteredEvents = events.filter { event ->
-        selectedCategory == "All" || event.category.equals(selectedCategory, ignoreCase = true)
+    val filteredEvents = if (selectedCategory == "All") {
+        events
+    } else {
+        events.filter { it.category.equals(selectedCategory, ignoreCase = true) }
     }
 
     Scaffold(
@@ -76,16 +81,24 @@ fun DashboardScreen(
             ) {
                 item {
                     Spacer(modifier = Modifier.height(24.dp))
+                    
+                    // Welcome message with actual name
                     Text(
-                        text = "Welcome back,\n${userProfile?.fullName ?: "..."}",
+                        text = "Welcome back,",
+                        fontSize = 18.sp,
+                        color = Color.Gray
+                    )
+                    Text(
+                        text = userProfile?.fullName ?: "Student",
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF1A237E),
                         lineHeight = 38.sp
                     )
+                    
                     Text(
-                        text = "Stay informed about updates at ${userProfile?.collegeId ?: "your institution"}.",
-                        fontSize = 15.sp,
+                        text = "Stay informed about updates at ${userProfile?.collegeId?.ifEmpty { "your institution" } ?: "your institution"}.",
+                        fontSize = 14.sp,
                         color = Color.Gray,
                         modifier = Modifier.padding(vertical = 12.dp)
                     )
@@ -125,7 +138,7 @@ fun DashboardScreen(
 
                     Spacer(modifier = Modifier.height(28.dp))
 
-                    // Category Selection
+                    // Real Functional Category Filters
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -161,7 +174,7 @@ fun DashboardScreen(
                             modifier = Modifier.fillMaxWidth().padding(top = 60.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("No alerts found in this category.", color = Color.Gray)
+                            Text("No alerts found for $selectedCategory.", color = Color.Gray)
                         }
                     }
                 } else {
