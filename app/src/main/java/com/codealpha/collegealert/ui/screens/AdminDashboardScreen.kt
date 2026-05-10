@@ -1,10 +1,12 @@
 package com.codealpha.collegealert.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -66,9 +68,9 @@ fun AdminDashboardScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         AdminActionItem(Icons.Default.AddBox, "Create New Event", "Publish to students", onAddNewEvent)
-                        Divider(modifier = Modifier.padding(vertical = 8.dp))
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         AdminActionItem(Icons.Default.Campaign, "Send Broadcast", "Push emergency alert") {}
-                        Divider(modifier = Modifier.padding(vertical = 8.dp))
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
                         AdminActionItem(Icons.Default.BarChart, "View Analytics", "Check engagement rates") {}
                     }
                 }
@@ -85,7 +87,6 @@ fun AdminDashboardScreen(
                 ) {
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                         Text("Attendance Graph Mockup", color = Color.White.copy(alpha = 0.6f))
-                        // In a real app, use a library like PhilJay/MPAndroidChart
                     }
                 }
             }
@@ -129,6 +130,6 @@ fun AdminActionItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title
             Text(title, fontWeight = FontWeight.Bold, color = Color(0xFF1A237E))
             Text(sub, fontSize = 12.sp, color = Color.Gray)
         }
-        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.LightGray)
+        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = Color.LightGray)
     }
 }

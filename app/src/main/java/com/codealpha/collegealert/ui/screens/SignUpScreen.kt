@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -41,7 +40,6 @@ fun SignUpScreen(
     val isLoading by viewModel.isLoading
     val error by viewModel.error
 
-    // Real-time Validations
     val isFullNameValid = fullName.isNotBlank()
     val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     val isCollegeValid = collegeId.length >= 3
@@ -57,8 +55,7 @@ fun SignUpScreen(
         focusedBorderColor = Color(0xFF1A237E),
         unfocusedBorderColor = Color.LightGray,
         focusedLabelColor = Color(0xFF1A237E),
-        unfocusedLabelColor = Color.Gray,
-        errorTextColor = Color.Red
+        unfocusedLabelColor = Color.Gray
     )
 
     Column(
@@ -83,20 +80,8 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text(
-            text = "Join Campus Sentinel",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF1A237E)
-        )
-
-        Text(
-            text = "Create your account to start receiving\nreal-time campus alerts.",
-            fontSize = 14.sp,
-            color = Color.Gray,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 8.dp)
-        )
+        Text(text = "Join Campus Sentinel", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1A237E))
+        Text(text = "Create your account for real-time alerts.", fontSize = 14.sp, color = Color.Gray)
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -111,31 +96,24 @@ fun SignUpScreen(
                 OutlinedTextField(
                     value = fullName,
                     onValueChange = { fullName = it },
-                    placeholder = { Text("Alex Rivers", color = Color.LightGray) },
+                    label = { Text("Alex Rivers") },
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
-                    singleLine = true,
-                    colors = textFieldColors
+                    colors = textFieldColors,
+                    singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text("COLLEGE NAME / ID", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
+                Text("COLLEGE NAME", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
                 OutlinedTextField(
                     value = collegeId,
                     onValueChange = { collegeId = it },
-                    placeholder = { Text("e.g. Stanford University", color = Color.LightGray) },
+                    label = { Text("e.g. Stanford University") },
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
-                    singleLine = true,
-                    supportingText = { 
-                        if (collegeId.isNotEmpty() && !isCollegeValid) {
-                            Text("Min 3 characters", color = Color.Red)
-                        } else {
-                            Text("Alerts will be filtered by this name")
-                        }
-                    },
-                    colors = textFieldColors
+                    colors = textFieldColors,
+                    singleLine = true
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -144,26 +122,36 @@ fun SignUpScreen(
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    placeholder = { Text("alex@university.edu", color = Color.LightGray) },
+                    label = { Text("alex@university.edu") },
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
+                    colors = textFieldColors,
                     isError = email.isNotEmpty() && !isEmailValid,
-                    singleLine = true,
-                    colors = textFieldColors
+                    singleLine = true
                 )
-                if (email.isNotEmpty() && !isEmailValid) {
-                    Text("Invalid email format", color = Color.Red, fontSize = 11.sp)
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                // ADMIN CHECKBOX IS HERE - MOVE TO A PROMINENT PLACE
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = isAdmin,
+                        onCheckedChange = { isAdmin = it },
+                        colors = CheckboxDefaults.colors(checkedColor = Color(0xFF1A237E))
+                    )
+                    Text("Register as Administrator", fontSize = 14.sp, color = Color(0xFF1A237E), fontWeight = FontWeight.Medium)
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Text("PASSWORD", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    placeholder = { Text("••••••••", color = Color.LightGray) },
+                    label = { Text("Min 6 characters") },
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
+                    colors = textFieldColors,
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
@@ -171,35 +159,11 @@ fun SignUpScreen(
                             Icon(imageVector = image, contentDescription = null, tint = Color(0xFF1A237E))
                         }
                     },
-                    isError = password.isNotEmpty() && !isPasswordValid,
-                    singleLine = true,
-                    colors = textFieldColors
+                    singleLine = true
                 )
-                if (password.isNotEmpty() && !isPasswordValid) {
-                    Text("Min 6 characters required", color = Color.Red, fontSize = 11.sp)
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Checkbox(
-                        checked = isAdmin,
-                        onCheckedChange = { isAdmin = it },
-                        colors = CheckboxDefaults.colors(checkedColor = Color(0xFF1A237E))
-                    )
-                    Text("Register as Administrator", fontSize = 14.sp, color = Color.Gray)
-                }
 
                 if (error != null) {
-                    Text(
-                        text = error!!,
-                        color = Color.Red,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
+                    Text(text = error!!, color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp))
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -207,9 +171,9 @@ fun SignUpScreen(
                 Button(
                     onClick = { 
                         if (canSubmit) {
-                            viewModel.signUp(fullName, email, password, collegeId, onSignUpSuccess)
+                            viewModel.signUp(fullName, email, password, collegeId, isAdmin, onSignUpSuccess)
                         } else {
-                            Toast.makeText(context, "Please complete the form correctly", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Please fill all fields correctly", Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(50.dp),
@@ -230,7 +194,7 @@ fun SignUpScreen(
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Already have an account? ", color = Color.Gray)
-            TextButton(onClick = onBackToLogin, contentPadding = PaddingValues(0.dp)) {
+            TextButton(onClick = onBackToLogin) {
                 Text("Sign In", color = Color(0xFF1A237E), fontWeight = FontWeight.Bold)
             }
         }
