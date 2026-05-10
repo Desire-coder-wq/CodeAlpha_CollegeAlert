@@ -1,5 +1,6 @@
 package com.codealpha.collegealert.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -12,10 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.codealpha.collegealert.R
 import com.codealpha.collegealert.viewmodel.AuthViewModel
 
 @Composable
@@ -97,6 +100,13 @@ fun ProfileScreen(
                 ) {
                     Text("Edit Profile")
                 }
+
+                OutlinedButton(
+                    onClick = { },
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                ) {
+                    Text("Digital ID")
+                }
             }
         }
 
@@ -104,11 +114,18 @@ fun ProfileScreen(
         ProfileSection(title = "Notification Preferences") {
             NotificationToggle("Exams & Deadlines", "Urgent alerts for academic schedules", true)
             NotificationToggle("Campus Fests & Events", "Updates about social and cultural activities", true)
+            NotificationToggle("Security & Safety Alerts", "Real-time emergency campus broadcasts", true)
         }
 
         // Account Settings
         ProfileSection(title = "Account Settings") {
-            SettingItem(Icons.Default.Lock, "Privacy & Security")
+            SettingItem(Icons.Default.Lock, "Privacy & Security", "Two-factor authentication and data usage")
+        }
+
+        // Support
+        ProfileSection(title = "Support") {
+            SettingItem(Icons.Default.Help, "Help Center")
+            SettingItem(Icons.Default.Info, "Privacy Policy")
         }
 
         Spacer(modifier = Modifier.weight(1f))
@@ -167,7 +184,7 @@ fun NotificationToggle(title: String, subtitle: String, checked: Boolean) {
 }
 
 @Composable
-fun SettingItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String) {
+fun SettingItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, subtitle: String? = null) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -176,7 +193,12 @@ fun SettingItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: St
     ) {
         Icon(icon, contentDescription = null, tint = Color(0xFF1A237E))
         Spacer(modifier = Modifier.width(16.dp))
-        Text(text = title, fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f))
-        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(18.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = title, fontWeight = FontWeight.Medium)
+            if (subtitle != null) {
+                Text(text = subtitle, fontSize = 14.sp, color = Color.Gray)
+            }
+        }
+        Icon(Icons.AutoMirrored.Filled.ArrowForwardIos, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(18.dp))
     }
 }
