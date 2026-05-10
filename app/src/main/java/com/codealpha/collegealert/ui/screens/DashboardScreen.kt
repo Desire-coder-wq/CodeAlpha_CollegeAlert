@@ -35,18 +35,14 @@ fun DashboardScreen(
     var selectedCategory by remember { mutableStateOf("All") }
     val categories = listOf("All", "Notice", "Seminar", "Exam", "Fest")
 
-    // Fetch events when the profile (specifically collegeId) is available
     LaunchedEffect(userProfile) {
         userProfile?.collegeId?.let { id ->
             eventViewModel.fetchEvents(id)
         }
     }
 
-    // Filter events based on selected category
-    val filteredEvents = if (selectedCategory == "All") {
-        events
-    } else {
-        events.filter { it.category.equals(selectedCategory, ignoreCase = true) }
+    val filteredEvents = events.filter { event ->
+        selectedCategory == "All" || event.category.equals(selectedCategory, ignoreCase = true)
     }
 
     Scaffold(
@@ -54,7 +50,7 @@ fun DashboardScreen(
             TopAppBar(
                 title = { Text("Campus Sentinel", fontWeight = FontWeight.Bold) },
                 actions = {
-                    IconButton(onClick = { /* Menu */ }) {
+                    IconButton(onClick = { /* Menu Action */ }) {
                         Icon(Icons.Default.Menu, contentDescription = "Menu")
                     }
                 },
@@ -79,21 +75,22 @@ fun DashboardScreen(
                     .padding(horizontal = 16.dp)
             ) {
                 item {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        text = "Welcome back,\n${userProfile?.fullName ?: "Student"}",
-                        fontSize = 28.sp,
+                        text = "Welcome back,\n${userProfile?.fullName ?: "..."}",
+                        fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1A237E)
+                        color = Color(0xFF1A237E),
+                        lineHeight = 38.sp
                     )
                     Text(
-                        text = "Your campus is monitored. Stay informed about updates at ${userProfile?.collegeId?.ifEmpty { "your institution" } ?: "your institution"}.",
-                        fontSize = 14.sp,
+                        text = "Stay informed about updates at ${userProfile?.collegeId ?: "your institution"}.",
+                        fontSize = 15.sp,
                         color = Color.Gray,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        modifier = Modifier.padding(vertical = 12.dp)
                     )
                     
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     
                     // Security Status Card
                     Card(
@@ -102,33 +99,33 @@ fun DashboardScreen(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Row(
-                            modifier = Modifier.padding(16.dp),
+                            modifier = Modifier.padding(20.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.Security, contentDescription = null, tint = Color.White)
-                            Spacer(modifier = Modifier.width(12.dp))
+                            Icon(Icons.Default.Security, contentDescription = null, tint = Color.White, modifier = Modifier.size(28.dp))
+                            Spacer(modifier = Modifier.width(16.dp))
                             Column(modifier = Modifier.weight(1f)) {
-                                Text("Security Status", color = Color.White, fontSize = 12.sp)
-                                Text("High Vigilance", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                                Text("SECURITY STATUS", color = Color.White.copy(alpha = 0.8f), fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text("High Vigilance", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                             }
                             Surface(
                                 color = Color(0xFFE65100),
-                                shape = RoundedCornerShape(4.dp)
+                                shape = RoundedCornerShape(6.dp)
                             ) {
                                 Text(
                                     "ACTIVE",
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                                     color = Color.White,
-                                    fontSize = 10.sp,
+                                    fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(28.dp))
 
-                    // Real Functional Filters
+                    // Category Selection
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -146,30 +143,32 @@ fun DashboardScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
                     
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("High-Priority Alerts", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color(0xFF1A237E))
+                        Text("High-Priority Alerts", fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Color(0xFF1A237E))
                         Spacer(modifier = Modifier.weight(1f))
                         if (filteredEvents.isNotEmpty()) {
-                            Text("🚨 Live Updates", color = Color.Red, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("🚨 Live", color = Color.Red, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
-                    if (filteredEvents.isEmpty()) {
-                        Box(
-                            modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text("No alerts found for $selectedCategory.", color = Color.Gray)
-                        }
-                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                items(filteredEvents) { event ->
-                    AlertCard(event = event, onClick = { onEventClick(event) })
-                    Spacer(modifier = Modifier.height(16.dp))
+                if (filteredEvents.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(top = 60.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("No alerts found in this category.", color = Color.Gray)
+                        }
+                    }
+                } else {
+                    items(filteredEvents) { event ->
+                        AlertCard(event = event, onClick = { onEventClick(event) })
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                 }
             }
         }
