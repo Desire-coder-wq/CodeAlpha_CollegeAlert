@@ -1,5 +1,6 @@
 package com.codealpha.collegealert.viewmodel
 
+import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -19,6 +20,9 @@ class EventViewModel(private val repository: EventRepository = EventRepository()
     private val _createEventSuccess = mutableStateOf(false)
     val createEventSuccess: State<Boolean> = _createEventSuccess
 
+    private val _uploadProgress = mutableStateOf<Float?>(null)
+    val uploadProgress: State<Float?> = _uploadProgress
+
     fun fetchEvents(collegeId: String) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -29,10 +33,25 @@ class EventViewModel(private val repository: EventRepository = EventRepository()
         }
     }
 
-    fun createEvent(event: Event) {
+    fun createEvent(event: Event, attachmentUri: Uri? = null) {
         viewModelScope.launch {
             _isLoading.value = true
-            val result = repository.createEvent(event)
+            
+            var finalEvent = event
+            
+            // If there's an attachment, upload it first
+            if (attachmentUri != null) {
+                val uploadResult = repository.uploadAttachment(attachmentUri, event.attachmentType ?: "file")
+                uploadResult.onSuccess { url ->
+                    finalEvent = event.copy(attachmentUrl = url)
+                }.onFailure {
+                    // Handle error if needed
+                    _isLoading.value = false
+                    return@launch
+                }
+            }
+
+            val result = repository.createEvent(finalEvent)
             if (result.isSuccess) {
                 _createEventSuccess.value = true
             }
