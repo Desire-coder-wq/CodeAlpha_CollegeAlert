@@ -8,8 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,33 +17,62 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.codealpha.collegealert.data.model.Event
+import com.codealpha.collegealert.ui.components.AlertCard
+import com.codealpha.collegealert.viewmodel.AuthViewModel
 import com.codealpha.collegealert.viewmodel.EventViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     onEventClick: (Event) -> Unit,
-    viewModel: EventViewModel = viewModel()
+    eventViewModel: EventViewModel = viewModel(),
+    authViewModel: AuthViewModel = viewModel()
 ) {
-    val events by viewModel.events
-    val isLoading by viewModel.isLoading
+    val events by eventViewModel.events
+    val isLoading by eventViewModel.isLoading
+    val userProfile by authViewModel.userProfile
+    
+    var searchQuery by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf("All") }
+    val categories = listOf("All", "Notice", "Seminar", "Exam", "Fest")
+
+    // Fetch events when the profile (specifically collegeId) is available
+    LaunchedEffect(userProfile) {
+        userProfile?.collegeId?.let { id ->
+            eventViewModel.fetchEvents(id)
+        }
+    }
+
+    // Filter events based on search query and selected category
+    val filteredEvents = events.filter { event ->
+        val matchesSearch = event.title.contains(searchQuery, ignoreCase = true) || 
+                          event.description.contains(searchQuery, ignoreCase = true)
+        val matchesCategory = selectedCategory == "All" || event.category.equals(selectedCategory, ignoreCase = true)
+        matchesSearch && matchesCategory
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Campus Sentinel", fontWeight = FontWeight.Bold) },
-                actions = {
-                    IconButton(onClick = { /* Search */ }) {
-                        Icon(Icons.Default.Search, contentDescription = "Search")
-                    }
-                    IconButton(onClick = { /* Menu */ }) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu")
-                    }
+                title = { 
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = { Text("Search campus alerts...", fontSize = 14.sp) },
+                        modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+                        shape = RoundedCornerShape(24.dp),
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            containerColor = Color.White,
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedBorderColor = Color.Transparent
+                        ),
+                        singleLine = true
+                    )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF1A237E),
-                    titleContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    titleContentColor = Color.White
                 )
             )
         }
@@ -64,26 +92,19 @@ fun DashboardScreen(
                 item {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "Welcome back,\nAlex",
+                        text = "Welcome back,\n${userProfile?.fullName?.split(" ")?.get(0) ?: "Student"}",
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF1A237E)
                     )
                     Text(
-                        text = "Your campus is monitored. Stay informed about active seminars, upcoming exams, and critical safety updates.",
+                        text = "Your campus is monitored. Stay informed about updates at ${userProfile?.collegeId ?: "your institution"}.",
                         fontSize = 14.sp,
                         color = Color.Gray,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
-                    Button(
-                        onClick = { /* View Reports */ },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A237E)),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text("View Active Reports")
-                    }
                     
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     
                     // Security Status Card
                     Card(
@@ -101,31 +122,27 @@ fun DashboardScreen(
                                 Text("Security Status", color = Color.White, fontSize = 12.sp)
                                 Text("High Vigilance", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                             }
-                            Surface(
-                                color = Color(0xFFE65100),
-                                shape = RoundedCornerShape(4.dp)
-                            ) {
-                                Text(
-                                    "ACTIVE",
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                                    color = Color.White,
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
                         }
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Filters
+                    // Real Functional Filters
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        FilterChip(selected = true, onClick = {}, label = { Text("All") })
-                        FilterChip(selected = false, onClick = {}, label = { Text("Seminars") })
-                        FilterChip(selected = false, onClick = {}, label = { Text("Exams") })
+                        categories.forEach { category ->
+                            FilterChip(
+                                selected = selectedCategory == category,
+                                onClick = { selectedCategory = category },
+                                label = { Text(category) },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = Color(0xFF1A237E),
+                                    selectedLabelColor = Color.White
+                                )
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -133,86 +150,25 @@ fun DashboardScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("High-Priority Alerts", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color(0xFF1A237E))
                         Spacer(modifier = Modifier.weight(1f))
-                        Text("🚨 Live Updates", color = Color.Red, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        if (filteredEvents.isNotEmpty()) {
+                            Text("🚨 Live", color = Color.Red, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        }
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     
-                    if (events.isEmpty()) {
-                        Text(
-                            text = "No alerts at the moment. Stay tuned!",
-                            color = Color.Gray,
-                            modifier = Modifier.padding(top = 16.dp)
-                        )
+                    if (filteredEvents.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("No alerts found matching your criteria.", color = Color.Gray)
+                        }
                     }
                 }
 
-                items(events) { event ->
+                items(filteredEvents) { event ->
                     AlertCard(event = event, onClick = { onEventClick(event) })
                     Spacer(modifier = Modifier.height(16.dp))
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun AlertCard(event: Event, onClick: () -> Unit) {
-    Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(2.dp),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Column {
-            // Placeholder for Image
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp)
-                    .background(Color.LightGray)
-            ) {
-                Surface(
-                    modifier = Modifier.padding(8.dp),
-                    color = if (event.category.lowercase() == "notice") Color.Red else Color(0xFF8B5000),
-                    shape = RoundedCornerShape(4.dp)
-                ) {
-                    Text(
-                        event.category.uppercase(),
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                        color = Color.White,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-            
-            Column(modifier = Modifier.padding(16.dp)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(event.title, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1A237E), modifier = Modifier.weight(1f))
-                    Text("Just now", fontSize = 10.sp, color = Color.Gray)
-                }
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(event.description, fontSize = 14.sp, color = Color.DarkGray, maxLines = 3)
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.AccessTime, 
-                        contentDescription = null, 
-                        modifier = Modifier.size(14.dp), 
-                        tint = Color.Gray
-                    )
-                    Text(" " + event.time, fontSize = 12.sp, color = Color.Gray)
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Icon(
-                        imageVector = Icons.Default.LocationOn, 
-                        contentDescription = null, 
-                        modifier = Modifier.size(14.dp), 
-                        tint = Color.Gray
-                    )
-                    Text(" " + event.venue, fontSize = 12.sp, color = Color.Gray)
                 }
             }
         }
