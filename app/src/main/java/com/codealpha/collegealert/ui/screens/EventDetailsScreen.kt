@@ -6,7 +6,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,7 +30,7 @@ fun EventDetailsScreen(
                 title = { Text("Alert Details", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -45,7 +48,7 @@ fun EventDetailsScreen(
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Hero Image Placeholder
+            // Hero Image placeholder
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -53,7 +56,7 @@ fun EventDetailsScreen(
                     .background(Color.Gray)
             ) {
                 Text(
-                    text = "📸 Event Banner",
+                    text = "📸 Tech Fest Image",
                     modifier = Modifier.align(Alignment.Center),
                     color = Color.White
                 )
@@ -99,7 +102,7 @@ fun EventDetailsScreen(
                 // Info Cards
                 InfoRow(icon = Icons.Default.CalendarToday, label = "Date", value = "Oct 15, 2024")
                 InfoRow(icon = Icons.Default.AccessTime, label = "Time", value = "10:00 AM - 4:00 PM")
-                InfoRow(icon = Icons.Default.LocationOn, label = "Venue", value = "Main Auditorium, Engineering Block 4")
+                InfoRow(icon = Icons.Default.LocationOn, label = "Venue", value = "Main Auditorium, Block 4")
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -112,7 +115,7 @@ fun EventDetailsScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Join us for the most anticipated annual technology gathering of the season. Tech Fest 2024 brings together students, industry leaders, and innovators for a day of groundbreaking demonstrations, coding marathons, and keynote speeches.",
+                    text = "Join us for the most anticipated annual technology gathering. Tech Fest 2024 brings together students, industry leaders, and innovators for a day of demonstrations and coding marathons.",
                     fontSize = 15.sp,
                     lineHeight = 24.sp,
                     color = Color(0xFF455A64)
@@ -144,6 +147,21 @@ fun EventDetailsScreen(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
+                // Speaker Lineup
+                Text(
+                    text = "Speaker Lineup",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color(0xFF1A237E)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                SpeakerItem("Dr. Sarah Chen", "CTO, Neural Dynamics")
+                SpeakerItem("Prof. James Miller", "Dept. Head, Computer Science")
+
+                Spacer(modifier = Modifier.height(32.dp))
+
                 // Important Note
                 Card(
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFFF9800)),
@@ -163,7 +181,7 @@ fun EventDetailsScreen(
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Please bring your student ID card for entry verification. Doors open at 09:30 AM.",
+                            text = "Please bring your student ID card for entry verification and workshop registration. Doors open at 09:30 AM.",
                             color = Color.White
                         )
                     }
@@ -186,6 +204,30 @@ fun InfoRow(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String
         Column {
             Text(text = label, fontSize = 14.sp, color = Color.Gray)
             Text(text = value, fontWeight = FontWeight.Medium, color = Color(0xFF1A237E))
+        }
+    }
+}
+
+@Composable
+fun SpeakerItem(name: String, title: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .background(Color(0xFF1A237E), RoundedCornerShape(50)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("👤", color = Color.White)
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Column {
+            Text(text = name, fontWeight = FontWeight.SemiBold, color = Color(0xFF1A237E))
+            Text(text = title, fontSize = 14.sp, color = Color.Gray)
         }
     }
 }
