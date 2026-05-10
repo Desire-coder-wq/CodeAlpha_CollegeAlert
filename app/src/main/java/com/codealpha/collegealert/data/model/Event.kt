@@ -12,6 +12,7 @@ data class Event(
     val time: String = "",
     val venue: String = "",
     val organizer: String = "College Admin",
+    val collegeId: String = "", // Added to filter alerts by school
 
     @ServerTimestamp
     val createdAt: Date? = null
