@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,6 +31,7 @@ fun SignUpScreen(
 ) {
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var collegeId by remember { mutableStateOf("") } // Real ID or Name of school
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     
@@ -42,8 +42,9 @@ fun SignUpScreen(
     // Real-time Validations
     val isFullNameValid = fullName.isNotBlank()
     val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    val isCollegeValid = collegeId.length >= 3
     val isPasswordValid = password.length >= 6
-    val canSubmit = isFullNameValid && isEmailValid && isPasswordValid
+    val canSubmit = isFullNameValid && isEmailValid && isCollegeValid && isPasswordValid
 
     Column(
         modifier = Modifier
@@ -79,7 +80,7 @@ fun SignUpScreen(
             text = "Create your account to start receiving\nreal-time campus alerts.",
             fontSize = 14.sp,
             color = Color.Gray,
-            textAlign = TextAlign.Center,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
             modifier = Modifier.padding(top = 8.dp)
         )
 
@@ -98,10 +99,22 @@ fun SignUpScreen(
                     value = fullName,
                     onValueChange = { fullName = it },
                     placeholder = { Text("Alex Rivers") },
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
-                    isError = fullName.isNotEmpty() && !isFullNameValid,
                     singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text("COLLEGE NAME / ID", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
+                OutlinedTextField(
+                    value = collegeId,
+                    onValueChange = { collegeId = it },
+                    placeholder = { Text("e.g. Stanford University") },
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    singleLine = true,
+                    supportingText = { Text("Alerts will be filtered by this name") }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -111,14 +124,11 @@ fun SignUpScreen(
                     value = email,
                     onValueChange = { email = it },
                     placeholder = { Text("alex@university.edu") },
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
                     isError = email.isNotEmpty() && !isEmailValid,
                     singleLine = true
                 )
-                if (email.isNotEmpty() && !isEmailValid) {
-                    Text("Invalid email format", color = Color.Red, fontSize = 11.sp)
-                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -127,7 +137,7 @@ fun SignUpScreen(
                     value = password,
                     onValueChange = { password = it },
                     placeholder = { Text("••••••••") },
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
@@ -140,7 +150,7 @@ fun SignUpScreen(
                     singleLine = true
                 )
                 if (password.isNotEmpty() && !isPasswordValid) {
-                    Text("Password must be at least 6 characters", color = Color.Red, fontSize = 11.sp)
+                    Text("Min 6 characters required", color = Color.Red, fontSize = 11.sp)
                 }
 
                 if (error != null) {
@@ -157,7 +167,7 @@ fun SignUpScreen(
                 Button(
                     onClick = { 
                         if (canSubmit) {
-                            viewModel.signUp(email, password, onSignUpSuccess)
+                            viewModel.signUp(fullName, email, password, collegeId, onSignUpSuccess)
                         } else {
                             Toast.makeText(context, "Please complete the form correctly", Toast.LENGTH_SHORT).show()
                         }
