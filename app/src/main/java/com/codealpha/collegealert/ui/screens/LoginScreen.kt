@@ -35,7 +35,6 @@ fun LoginScreen(
     val isLoading by viewModel.isLoading
     val error by viewModel.error
 
-    // Simple validation logic
     val isEmailValid = android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
     val isPasswordValid = password.length >= 6
 
@@ -80,15 +79,20 @@ fun LoginScreen(
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    placeholder = { Text("alex@university.edu") },
+                    label = { Text("Email Address") },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                     shape = RoundedCornerShape(8.dp),
                     isError = email.isNotEmpty() && !isEmailValid,
-                    singleLine = true
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color(0xFF1A237E),
+                        unfocusedTextColor = Color(0xFF1A237E),
+                        focusedLabelColor = Color(0xFF1A237E),
+                        unfocusedLabelColor = Color.Gray,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    )
                 )
-                if (email.isNotEmpty() && !isEmailValid) {
-                    Text("Enter a valid email address", color = Color.Red, fontSize = 11.sp)
-                }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -96,7 +100,7 @@ fun LoginScreen(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    placeholder = { Text("••••••••") },
+                    label = { Text("Enter Password") },
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                     shape = RoundedCornerShape(8.dp),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -106,7 +110,15 @@ fun LoginScreen(
                             Icon(imageVector = image, contentDescription = null, tint = Color(0xFF1A237E))
                         }
                     },
-                    singleLine = true
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color(0xFF1A237E),
+                        unfocusedTextColor = Color(0xFF1A237E),
+                        focusedLabelColor = Color(0xFF1A237E),
+                        unfocusedLabelColor = Color.Gray,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    )
                 )
 
                 if (error != null) {
@@ -125,13 +137,13 @@ fun LoginScreen(
                         if (isEmailValid && isPasswordValid) {
                             viewModel.signIn(email, password, onLoginSuccess)
                         } else {
-                            Toast.makeText(context, "Please check your credentials", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Check email/password format", Toast.LENGTH_SHORT).show()
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF000051)),
                     shape = RoundedCornerShape(8.dp),
-                    enabled = !isLoading && isEmailValid && isPasswordValid
+                    enabled = !isLoading
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))

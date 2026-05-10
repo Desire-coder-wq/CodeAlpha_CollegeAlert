@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -31,7 +32,7 @@ fun SignUpScreen(
 ) {
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var collegeId by remember { mutableStateOf("") } // Real ID or Name of school
+    var collegeId by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     
@@ -56,7 +57,6 @@ fun SignUpScreen(
     ) {
         Spacer(modifier = Modifier.height(40.dp))
 
-        // App Logo
         Surface(
             modifier = Modifier.size(64.dp),
             shape = RoundedCornerShape(12.dp),
@@ -80,13 +80,12 @@ fun SignUpScreen(
             text = "Create your account to start receiving\nreal-time campus alerts.",
             fontSize = 14.sp,
             color = Color.Gray,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            textAlign = TextAlign.Center,
             modifier = Modifier.padding(top = 8.dp)
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Sign Up Card
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -98,10 +97,18 @@ fun SignUpScreen(
                 OutlinedTextField(
                     value = fullName,
                     onValueChange = { fullName = it },
-                    placeholder = { Text("Alex Rivers") },
+                    label = { Text("Alex Rivers") },
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
-                    singleLine = true
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color(0xFF1A237E),
+                        unfocusedTextColor = Color(0xFF1A237E),
+                        focusedLabelColor = Color(0xFF1A237E),
+                        unfocusedLabelColor = Color.Gray,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -110,11 +117,25 @@ fun SignUpScreen(
                 OutlinedTextField(
                     value = collegeId,
                     onValueChange = { collegeId = it },
-                    placeholder = { Text("e.g. Stanford University") },
+                    label = { Text("e.g. Stanford University") },
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
                     singleLine = true,
-                    supportingText = { Text("Alerts will be filtered by this name") }
+                    supportingText = { 
+                        if (collegeId.isNotEmpty() && !isCollegeValid) {
+                            Text("Min 3 characters", color = Color.Red)
+                        } else {
+                            Text("Alerts will be filtered by this name")
+                        }
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color(0xFF1A237E),
+                        unfocusedTextColor = Color(0xFF1A237E),
+                        focusedLabelColor = Color(0xFF1A237E),
+                        unfocusedLabelColor = Color.Gray,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    )
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -123,12 +144,23 @@ fun SignUpScreen(
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    placeholder = { Text("alex@university.edu") },
+                    label = { Text("alex@university.edu") },
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
                     isError = email.isNotEmpty() && !isEmailValid,
-                    singleLine = true
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color(0xFF1A237E),
+                        unfocusedTextColor = Color(0xFF1A237E),
+                        focusedLabelColor = Color(0xFF1A237E),
+                        unfocusedLabelColor = Color.Gray,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    )
                 )
+                if (email.isNotEmpty() && !isEmailValid) {
+                    Text("Invalid email format", color = Color.Red, fontSize = 11.sp)
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -136,7 +168,7 @@ fun SignUpScreen(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    placeholder = { Text("••••••••") },
+                    label = { Text("••••••••") },
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -147,7 +179,15 @@ fun SignUpScreen(
                         }
                     },
                     isError = password.isNotEmpty() && !isPasswordValid,
-                    singleLine = true
+                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color(0xFF1A237E),
+                        unfocusedTextColor = Color(0xFF1A237E),
+                        focusedLabelColor = Color(0xFF1A237E),
+                        unfocusedLabelColor = Color.Gray,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    )
                 )
                 if (password.isNotEmpty() && !isPasswordValid) {
                     Text("Min 6 characters required", color = Color.Red, fontSize = 11.sp)
