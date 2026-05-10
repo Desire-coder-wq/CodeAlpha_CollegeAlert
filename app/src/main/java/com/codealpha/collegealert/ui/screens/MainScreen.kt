@@ -2,6 +2,7 @@ package com.codealpha.collegealert.ui.screens
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.NotificationsNone
@@ -29,7 +30,8 @@ sealed class Screen(val route: String, val label: String, val icon: androidx.com
 @Composable
 fun MainScreen(
     onEventClick: (Event) -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onAddEventClick: () -> Unit
 ) {
     val navController = rememberNavController()
     val items = listOf(
@@ -40,6 +42,15 @@ fun MainScreen(
     )
 
     Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = onAddEventClick,
+                containerColor = Color(0xFFFF9800),
+                contentColor = Color.White
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add Alert")
+            }
+        },
         bottomBar = {
             NavigationBar(
                 containerColor = Color.White,
@@ -87,7 +98,7 @@ fun MainScreen(
                 AlertsScreen(onEventClick = onEventClick)
             }
             composable(Screen.Discover.route) {
-                ExploreScreen() // Using your premium Explore UI
+                ExploreScreen()
             }
             composable(Screen.Profile.route) {
                 ProfileScreen(onLogout = onLogout)
