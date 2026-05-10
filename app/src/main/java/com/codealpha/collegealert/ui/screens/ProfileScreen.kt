@@ -7,7 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.automirrored.filled.ChevronRight
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -67,7 +67,9 @@ fun ProfileScreen(
                         shape = CircleShape,
                         color = Color(0xFFFF9800)
                     ) {
-                        Icon(Icons.Default.Edit, contentDescription = null, tint = Color.White, modifier = Modifier.padding(6.dp))
+                        IconButton(onClick = { /* TODO: Implement Image Picker */ }) {
+                            Icon(Icons.Default.Edit, contentDescription = null, tint = Color.White, modifier = Modifier.padding(6.dp))
+                        }
                     }
                 }
 
@@ -135,7 +137,7 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ProfileSection(title: String, content: @Composable () -> Unit) {
+fun ProfileSection(title: String, content: @Composable ColumnScope.() -> Unit) {
     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
         Text(text = title, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1A237E), modifier = Modifier.padding(bottom = 8.dp, start = 8.dp))
         Card(shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color.White), elevation = CardDefaults.cardElevation(1.dp)) {
@@ -164,6 +166,6 @@ fun SettingItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: St
             Text(text = title, fontWeight = FontWeight.Medium, color = Color(0xFF1A237E))
             Text(text = subtitle, fontSize = 12.sp, color = Color.Gray)
         }
-        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(18.dp))
+        Icon(Icons.AutoMirrored.Filled.ChevronRight, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(18.dp))
     }
 }
