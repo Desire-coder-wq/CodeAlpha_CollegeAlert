@@ -81,8 +81,8 @@ fun DashboardScreen(
                 item {
                     Spacer(modifier = Modifier.height(24.dp))
                     
-                    // Improved personalization logic
-                    val displayName = userProfile?.fullName ?: "Member"
+                    // Welcome message with actual name from Firebase profile
+                    val displayName = userProfile?.fullName ?: "Student"
                     
                     Text(
                         text = "Welcome back,",
@@ -98,10 +98,10 @@ fun DashboardScreen(
                     )
                     
                     Text(
-                        text = "Stay informed about updates at ${userProfile?.collegeId?.ifEmpty { "your institution" } ?: "your institution"}.",
+                        text = "Your campus is monitored at ${userProfile?.collegeId?.ifEmpty { "your institution" } ?: "your institution"}.",
                         fontSize = 14.sp,
                         color = Color.Gray,
-                        modifier = Modifier.padding(vertical = 12.dp)
+                        modifier = Modifier.padding(vertical = 8.dp)
                     )
                     
                     Spacer(modifier = Modifier.height(8.dp))
@@ -113,31 +113,19 @@ fun DashboardScreen(
                         shape = RoundedCornerShape(12.dp)
                     ) {
                         Row(
-                            modifier = Modifier.padding(20.dp),
+                            modifier = Modifier.padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.Security, contentDescription = null, tint = Color.White, modifier = Modifier.size(28.dp))
+                            Icon(Icons.Default.Security, contentDescription = null, tint = Color.White)
                             Spacer(modifier = Modifier.width(12.dp))
                             Column(modifier = Modifier.weight(1f)) {
-                                Text("SECURITY STATUS", color = Color.White.copy(alpha = 0.8f), fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                                Text("High Vigilance", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                            }
-                            Surface(
-                                color = Color(0xFFE65100),
-                                shape = RoundedCornerShape(6.dp)
-                            ) {
-                                Text(
-                                    "ACTIVE",
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                                    color = Color.White,
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
+                                Text("Security Status", color = Color.White, fontSize = 12.sp)
+                                Text("High Vigilance", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(28.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     // Functional Category Filters
                     Row(
@@ -160,7 +148,7 @@ fun DashboardScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("High-Priority Alerts", fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Color(0xFF1A237E))
+                        Text("High-Priority Alerts", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = Color(0xFF1A237E))
                         Spacer(modifier = Modifier.weight(1f))
                         if (filteredEvents.isNotEmpty()) {
                             Text("🚨 Live Updates", color = Color.Red, fontSize = 12.sp, fontWeight = FontWeight.Bold)
