@@ -26,12 +26,19 @@ fun ProfileScreen(
     onLogout: () -> Unit,
     viewModel: AuthViewModel = viewModel()
 ) {
+    val userProfile by viewModel.userProfile
+    val isLoading by viewModel.isLoading
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF8F9FB))
             .verticalScroll(rememberScrollState())
     ) {
+        if (isLoading) {
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = Color(0xFFFF9800))
+        }
+
         // Profile Header Card
         Card(
             modifier = Modifier
@@ -47,9 +54,7 @@ fun ProfileScreen(
             ) {
                 Box {
                     Surface(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape),
+                        modifier = Modifier.size(100.dp).clip(CircleShape),
                         color = Color(0xFF1A237E)
                     ) {
                         Box(contentAlignment = Alignment.Center) {
@@ -57,78 +62,61 @@ fun ProfileScreen(
                         }
                     }
                     Surface(
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .size(28.dp),
+                        modifier = Modifier.align(Alignment.BottomEnd).size(28.dp),
                         shape = CircleShape,
                         color = Color(0xFFFF9800)
                     ) {
-                        Icon(
-                            Icons.Default.Edit,
-                            contentDescription = "Edit",
-                            tint = Color.White,
-                            modifier = Modifier.padding(6.dp)
-                        )
+                        Icon(Icons.Default.Edit, contentDescription = null, tint = Color.White, modifier = Modifier.padding(6.dp))
                     }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Alex Rivers",
+                    text = userProfile?.fullName ?: "Loading...",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1A237E)
                 )
 
                 Text(
-                    text = "Computer Science Dept.",
-                    fontSize = 16.sp,
+                    text = userProfile?.email ?: "",
+                    fontSize = 14.sp,
                     color = Color.Gray
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    AssistChip(onClick = {}, label = { Text("ID: 2024-8832") })
-                    AssistChip(onClick = {}, label = { Text("Class of 2026") })
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Button(
-                    onClick = { },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A237E)),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("Edit Profile")
-                }
-
-                OutlinedButton(
-                    onClick = { },
-                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("Digital ID", color = Color(0xFF1A237E))
+                    AssistChip(onClick = {}, label = { Text("ID: ${userProfile?.universityId?.ifEmpty { "N/A" }}") })
+                    AssistChip(onClick = {}, label = { Text(userProfile?.collegeId ?: "No College") })
                 }
             }
         }
 
-        // Settings Sections
+        // Real functional toggles
         ProfileSection(title = "Notification Preferences") {
-            NotificationToggle("Exams & Deadlines", "Urgent alerts for academic schedules", true)
-            NotificationToggle("Campus Fests & Events", "Updates about social activities", true)
+            NotificationToggle(
+                title = "Exams & Deadlines",
+                subtitle = "Urgent alerts for academic schedules",
+                checked = userProfile?.examsNotificationsEnabled ?: true,
+                onCheckedChange = { enabled ->
+                    userProfile?.let { viewModel.updateProfile(it.copy(examsNotificationsEnabled = enabled)) }
+                }
+            )
+            NotificationToggle(
+                title = "Campus Fests & Events",
+                subtitle = "Updates about social activities",
+                checked = userProfile?.festsNotificationsEnabled ?: true,
+                onCheckedChange = { enabled ->
+                    userProfile?.let { viewModel.updateProfile(it.copy(festsNotificationsEnabled = enabled)) }
+                }
+            )
         }
 
         ProfileSection(title = "Account Settings") {
-            SettingItem(Icons.Default.Lock, "Privacy & Security", "Data usage and security")
-            SettingItem(Icons.Default.Language, "App Language", "English (United States)")
-        }
-
-        ProfileSection(title = "Support") {
-            SettingItem(Icons.AutoMirrored.Filled.Help, "Help Center")
-            SettingItem(Icons.Default.Info, "Privacy Policy")
+            SettingItem(Icons.Default.Lock, "Privacy & Security", "Manage your data")
+            SettingItem(Icons.Default.Language, "App Language", "English (US)")
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -136,7 +124,7 @@ fun ProfileScreen(
         // Logout Button
         TextButton(
             onClick = { viewModel.logout(onLogout) },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp)
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)
         ) {
             Text("LOG OUT", color = Color.Red, fontWeight = FontWeight.Bold, fontSize = 16.sp)
         }
@@ -148,48 +136,32 @@ fun ProfileScreen(
 @Composable
 fun ProfileSection(title: String, content: @Composable () -> Unit) {
     Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-        Text(
-            text = title,
-            fontWeight = FontWeight.Bold,
-            fontSize = 18.sp,
-            color = Color(0xFF1A237E),
-            modifier = Modifier.padding(bottom = 8.dp, start = 8.dp)
-        )
-        Card(
-            shape = RoundedCornerShape(12.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
-            elevation = CardDefaults.cardElevation(1.dp)
-        ) {
+        Text(text = title, fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color(0xFF1A237E), modifier = Modifier.padding(bottom = 8.dp, start = 8.dp))
+        Card(shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color.White), elevation = CardDefaults.cardElevation(1.dp)) {
             Column { content() }
         }
     }
 }
 
 @Composable
-fun NotificationToggle(title: String, subtitle: String, checked: Boolean) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+fun NotificationToggle(title: String, subtitle: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(modifier = Modifier.weight(1f)) {
             Text(text = title, fontWeight = FontWeight.Medium, color = Color(0xFF1A237E))
-            Text(text = subtitle, fontSize = 14.sp, color = Color.Gray)
+            Text(text = subtitle, fontSize = 13.sp, color = Color.Gray)
         }
-        Switch(checked = checked, onCheckedChange = {})
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
     }
 }
 
 @Composable
-fun SettingItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, subtitle: String? = null) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+fun SettingItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, subtitle: String) {
+    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
         Icon(icon, contentDescription = null, tint = Color(0xFF1A237E))
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(text = title, fontWeight = FontWeight.Medium, color = Color(0xFF1A237E))
-            if (subtitle != null) Text(text = subtitle, fontSize = 14.sp, color = Color.Gray)
+            Text(text = subtitle, fontSize = 12.sp, color = Color.Gray)
         }
         Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(18.dp))
     }
