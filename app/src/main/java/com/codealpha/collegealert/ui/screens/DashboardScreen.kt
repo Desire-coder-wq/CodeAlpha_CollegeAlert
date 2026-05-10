@@ -41,9 +41,6 @@ fun DashboardScreen(
                     actionIconContentColor = Color.White
                 )
             )
-        },
-        bottomBar = {
-            BottomNavigationBar(onProfileClick = onProfileClick)
         }
     ) { padding ->
         LazyColumn(
@@ -205,39 +202,5 @@ fun AlertCard(event: Event, onClick: () -> Unit) {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun BottomNavigationBar(onProfileClick: () -> Unit) {
-    NavigationBar(
-        containerColor = Color.White,
-        tonalElevation = 8.dp
-    ) {
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.GridView, contentDescription = "Home") },
-            label = { Text("Home") },
-            selected = true,
-            onClick = { },
-            colors = NavigationBarItemDefaults.colors(selectedIconColor = Color(0xFFFF9800), selectedTextColor = Color(0xFFFF9800), indicatorColor = Color(0xFFFFF3E0))
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.NotificationsNone, contentDescription = "Alerts") },
-            label = { Text("Alerts") },
-            selected = false,
-            onClick = { }
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Explore, contentDescription = "Discover") },
-            label = { Text("Discover") },
-            selected = false,
-            onClick = { }
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.PersonOutline, contentDescription = "Profile") },
-            label = { Text("Profile") },
-            selected = false,
-            onClick = onProfileClick
-        )
     }
 }
