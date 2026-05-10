@@ -12,7 +12,13 @@ data class Event(
     val time: String = "",
     val venue: String = "",
     val organizer: String = "College Admin",
-    val collegeId: String = "", // Added to filter alerts by school
+    val collegeId: String = "",
+    
+    // Extensible Features
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+    val attachmentUrl: String? = null,
+    val attachmentType: String? = null, // "image", "video", "file"
 
     @ServerTimestamp
     val createdAt: Date? = null

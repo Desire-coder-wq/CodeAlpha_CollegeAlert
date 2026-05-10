@@ -34,6 +34,7 @@ fun SignUpScreen(
     var email by remember { mutableStateOf("") }
     var collegeId by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var isAdmin by remember { mutableStateOf(false) }
     var passwordVisible by remember { mutableStateOf(false) }
     
     val context = LocalContext.current
@@ -55,6 +56,8 @@ fun SignUpScreen(
         cursorColor = Color(0xFF1A237E),
         focusedBorderColor = Color(0xFF1A237E),
         unfocusedBorderColor = Color.LightGray,
+        focusedLabelColor = Color(0xFF1A237E),
+        unfocusedLabelColor = Color.Gray,
         errorTextColor = Color.Red
     )
 
@@ -174,6 +177,20 @@ fun SignUpScreen(
                 )
                 if (password.isNotEmpty() && !isPasswordValid) {
                     Text("Min 6 characters required", color = Color.Red, fontSize = 11.sp)
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Checkbox(
+                        checked = isAdmin,
+                        onCheckedChange = { isAdmin = it },
+                        colors = CheckboxDefaults.colors(checkedColor = Color(0xFF1A237E))
+                    )
+                    Text("Register as Administrator", fontSize = 14.sp, color = Color.Gray)
                 }
 
                 if (error != null) {
