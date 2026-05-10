@@ -35,7 +35,6 @@ fun DashboardScreen(
     var selectedCategory by remember { mutableStateOf("All") }
     val categories = listOf("All", "Notice", "Seminar", "Exam", "Fest")
 
-    // Fetch events based on college ID
     LaunchedEffect(userProfile) {
         userProfile?.collegeId?.let { id ->
             if (id.isNotEmpty()) {
@@ -82,14 +81,16 @@ fun DashboardScreen(
                 item {
                     Spacer(modifier = Modifier.height(24.dp))
                     
-                    // Welcome message with actual name
+                    // Improved personalization logic
+                    val displayName = userProfile?.fullName ?: "Member"
+                    
                     Text(
                         text = "Welcome back,",
                         fontSize = 18.sp,
                         color = Color.Gray
                     )
                     Text(
-                        text = userProfile?.fullName ?: "Student",
+                        text = displayName,
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF1A237E),
@@ -116,7 +117,7 @@ fun DashboardScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(Icons.Default.Security, contentDescription = null, tint = Color.White, modifier = Modifier.size(28.dp))
-                            Spacer(modifier = Modifier.width(16.dp))
+                            Spacer(modifier = Modifier.width(12.dp))
                             Column(modifier = Modifier.weight(1f)) {
                                 Text("SECURITY STATUS", color = Color.White.copy(alpha = 0.8f), fontSize = 11.sp, fontWeight = FontWeight.Bold)
                                 Text("High Vigilance", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 20.sp)
@@ -138,7 +139,7 @@ fun DashboardScreen(
 
                     Spacer(modifier = Modifier.height(28.dp))
 
-                    // Real Functional Category Filters
+                    // Functional Category Filters
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -156,22 +157,22 @@ fun DashboardScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("High-Priority Alerts", fontWeight = FontWeight.Bold, fontSize = 22.sp, color = Color(0xFF1A237E))
                         Spacer(modifier = Modifier.weight(1f))
                         if (filteredEvents.isNotEmpty()) {
-                            Text("🚨 Live", color = Color.Red, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                            Text("🚨 Live Updates", color = Color.Red, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                         }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
 
                 if (filteredEvents.isEmpty()) {
                     item {
                         Box(
-                            modifier = Modifier.fillMaxWidth().padding(top = 60.dp),
+                            modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             Text("No alerts found for $selectedCategory.", color = Color.Gray)
