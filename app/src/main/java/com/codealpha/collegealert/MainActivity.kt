@@ -1,12 +1,14 @@
 package com.codealpha.collegealert
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -34,26 +36,21 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    // Create shared ViewModels
     val authViewModel: AuthViewModel = viewModel()
     val eventViewModel: EventViewModel = viewModel()
-    
-    val userProfile = authViewModel.userProfile.value
+    val context = LocalContext.current
 
     NavHost(navController = navController, startDestination = "splash") {
-        // 1. Splash Screen
         composable("splash") {
             SplashScreen(navController = navController)
         }
 
-        // 2. Onboarding Screen
         composable("home") {
             HomeScreen(
                 onGetStartedClick = { navController.navigate("login") }
             )
         }
 
-        // 3. Login Screen
         composable("login") {
             LoginScreen(
                 onLoginSuccess = {
@@ -68,11 +65,14 @@ fun AppNavigation() {
             )
         }
 
-        // 4. Registration Screen
         composable("signup") {
             SignUpScreen(
                 onSignUpSuccess = {
-                    navController.navigate("login")
+                    // SPEED OPTIMIZATION: Go directly to dashboard after signup
+                    Toast.makeText(context, "Account created! Welcome to Sentinel.", Toast.LENGTH_LONG).show()
+                    navController.navigate("main") {
+                        popUpTo("home") { inclusive = true }
+                    }
                 },
                 onBackToLogin = {
                     navController.popBackStack()
@@ -81,7 +81,6 @@ fun AppNavigation() {
             )
         }
 
-        // 5. The Main App Hub
         composable("main") {
             MainScreen(
                 onEventClick = { event ->
@@ -105,7 +104,6 @@ fun AppNavigation() {
             )
         }
 
-        // 6. Alert Details
         composable("eventDetails") {
             val event = eventViewModel.selectedEvent.value
             if (event != null) {
@@ -116,7 +114,6 @@ fun AppNavigation() {
             }
         }
 
-        // 7. Add Event Screen (Admin Mode)
         composable("addEvent") {
             AddEventScreen(
                 onBackClick = { navController.popBackStack() },
@@ -125,7 +122,6 @@ fun AppNavigation() {
             )
         }
         
-        // 8. Admin Dashboard
         composable("adminDashboard") {
             AdminDashboardScreen(
                 onBackClick = { navController.popBackStack() },

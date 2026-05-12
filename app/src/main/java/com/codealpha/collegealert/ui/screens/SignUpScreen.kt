@@ -80,8 +80,12 @@ fun SignUpScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text(text = "Join Campus Sentinel", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color(0xFF1A237E))
-        Text(text = "Create your account for real-time alerts.", fontSize = 14.sp, color = Color.Gray)
+        Text(
+            text = "Join Campus Sentinel",
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1A237E)
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -99,8 +103,8 @@ fun SignUpScreen(
                     label = { Text("Alex Rivers") },
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
-                    colors = textFieldColors,
-                    singleLine = true
+                    singleLine = true,
+                    colors = textFieldColors
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -112,8 +116,8 @@ fun SignUpScreen(
                     label = { Text("e.g. Stanford University") },
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
-                    colors = textFieldColors,
-                    singleLine = true
+                    singleLine = true,
+                    colors = textFieldColors
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -125,24 +129,12 @@ fun SignUpScreen(
                     label = { Text("alex@university.edu") },
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
-                    colors = textFieldColors,
                     isError = email.isNotEmpty() && !isEmailValid,
-                    singleLine = true
+                    singleLine = true,
+                    colors = textFieldColors
                 )
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                // ADMIN CHECKBOX IS HERE - MOVE TO A PROMINENT PLACE
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = isAdmin,
-                        onCheckedChange = { isAdmin = it },
-                        colors = CheckboxDefaults.colors(checkedColor = Color(0xFF1A237E))
-                    )
-                    Text("Register as Administrator", fontSize = 14.sp, color = Color(0xFF1A237E), fontWeight = FontWeight.Medium)
-                }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Text("PASSWORD", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
                 OutlinedTextField(
@@ -151,7 +143,6 @@ fun SignUpScreen(
                     label = { Text("Min 6 characters") },
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
-                    colors = textFieldColors,
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
@@ -159,14 +150,30 @@ fun SignUpScreen(
                             Icon(imageVector = image, contentDescription = null, tint = Color(0xFF1A237E))
                         }
                     },
-                    singleLine = true
+                    isError = password.isNotEmpty() && !isPasswordValid,
+                    singleLine = true,
+                    colors = textFieldColors
                 )
+
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Checkbox(
+                        checked = isAdmin,
+                        onCheckedChange = { isAdmin = it },
+                        colors = CheckboxDefaults.colors(checkedColor = Color(0xFF1A237E))
+                    )
+                    Text("Register as Administrator", fontSize = 14.sp, color = Color(0xFF1A237E), fontWeight = FontWeight.SemiBold)
+                }
 
                 if (error != null) {
                     Text(text = error!!, color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp))
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Button(
                     onClick = { 
@@ -190,7 +197,7 @@ fun SignUpScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text("Already have an account? ", color = Color.Gray)

@@ -40,7 +40,11 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
             val result = repository.signIn(email, pass)
             result.onSuccess { firebaseUser ->
                 _user.value = firebaseUser
-                firebaseUser?.let { fetchUserProfile(it.uid) }
+                if (firebaseUser != null) {
+                    // Wait for profile to load so Admin status is known immediately
+                    val profile = repository.getUserProfile(firebaseUser.uid)
+                    _userProfile.value = profile
+                }
                 _isLoading.value = false
                 onSuccess()
             }.onFailure {
@@ -57,7 +61,16 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
             val result = repository.signUp(fullName, email, pass, collegeId, isAdmin)
             result.onSuccess { firebaseUser ->
                 _user.value = firebaseUser
-                firebaseUser?.let { fetchUserProfile(it.uid) }
+                if (firebaseUser != null) {
+                    // Set profile immediately in memory to avoid extra network call
+                    _userProfile.value = User(
+                        uid = firebaseUser.uid,
+                        fullName = fullName,
+                        email = email,
+                        collegeId = collegeId,
+                        isAdmin = isAdmin
+                    )
+                }
                 _isLoading.value = false
                 onSuccess()
             }.onFailure {

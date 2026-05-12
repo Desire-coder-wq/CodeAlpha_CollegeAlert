@@ -46,6 +46,8 @@ fun LoginScreen(
         cursorColor = Color(0xFF1A237E),
         focusedBorderColor = Color(0xFF1A237E),
         unfocusedBorderColor = Color.LightGray,
+        focusedLabelColor = Color(0xFF1A237E),
+        unfocusedLabelColor = Color.Gray,
         errorTextColor = Color.Red
     )
 
@@ -90,7 +92,6 @@ fun LoginScreen(
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
-                    // CHANGED: Using placeholder instead of label so it disappears when typing
                     placeholder = { Text("alex@university.edu", color = Color.LightGray) },
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
@@ -105,7 +106,6 @@ fun LoginScreen(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    // CHANGED: Using placeholder instead of label
                     placeholder = { Text("••••••••", color = Color.LightGray) },
                     modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
@@ -129,7 +129,10 @@ fun LoginScreen(
                 Button(
                     onClick = { 
                         if (isEmailValid && isPasswordValid) {
-                            viewModel.signIn(email, password, onLoginSuccess)
+                            viewModel.signIn(email, password) {
+                                Toast.makeText(context, "Welcome back!", Toast.LENGTH_SHORT).show()
+                                onLoginSuccess()
+                            }
                         } else {
                             Toast.makeText(context, "Check email/password format", Toast.LENGTH_SHORT).show()
                         }

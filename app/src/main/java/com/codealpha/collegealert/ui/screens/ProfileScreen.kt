@@ -7,8 +7,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -94,6 +94,15 @@ fun ProfileScreen(
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     AssistChip(onClick = {}, label = { Text("ID: ${userProfile?.universityId?.ifEmpty { "N/A" } ?: "N/A"}") })
                     AssistChip(onClick = {}, label = { Text(userProfile?.collegeId ?: "No College") })
+                }
+                
+                if (userProfile?.isAdmin == true) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    SuggestionChip(
+                        onClick = { /* This is handled via the FAB on dashboard but can add here too */ },
+                        label = { Text("Administrator Mode") },
+                        colors = SuggestionChipDefaults.suggestionChipColors(labelColor = Color(0xFFFF9800))
+                    )
                 }
             }
         }

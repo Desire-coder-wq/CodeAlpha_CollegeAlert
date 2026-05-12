@@ -116,8 +116,7 @@ fun MainScreen(
             }
             composable(Screen.Alerts.route) {
                 AlertsScreen(
-                    onEventClick = onEventClick,
-                    authViewModel = authViewModel
+                    onEventClick = onEventClick
                 )
             }
             composable(Screen.Discover.route) {
