@@ -25,9 +25,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.codealpha.collegealert.data.model.Event
+import com.codealpha.collegealert.ui.components.MapPicker
 import com.codealpha.collegealert.viewmodel.AuthViewModel
 import com.codealpha.collegealert.viewmodel.EventViewModel
 import java.util.*
@@ -45,6 +47,7 @@ fun AddEventScreen(
     var venue by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("") }
     var date by remember { mutableStateOf("") }
+    var showMap by remember { mutableStateOf(false) }
 
     // Extensible Features State
     var selectedUri by remember { mutableStateOf<Uri?>(null) }
@@ -168,12 +171,7 @@ fun AddEventScreen(
                 }
 
                 Button(
-                    onClick = {
-                        // For demonstration, set a static location (Kampala, Uganda)
-                        latitude = 0.3476
-                        longitude = 32.5825
-                        Toast.makeText(context, "Location tagged!", Toast.LENGTH_SHORT).show()
-                    },
+                    onClick = { showMap = true },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE8EAF6), contentColor = Color(0xFF1A237E)),
                     shape = RoundedCornerShape(8.dp)
@@ -293,6 +291,43 @@ fun AddEventScreen(
                     Icon(Icons.Default.CloudUpload, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Publish Alert Now", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                }
+            }
+        }
+    }
+
+    // Map Picker Dialog
+    if (showMap) {
+        Dialog(onDismissRequest = { showMap = false }) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Text(
+                        "Pick Location on Map",
+                        modifier = Modifier.padding(16.dp),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    MapPicker(
+                        modifier = Modifier.weight(1f),
+                        onLocationPicked = { lat, lon ->
+                            latitude = lat
+                            longitude = lon
+                        }
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(onClick = { showMap = false }) {
+                            Text("Cancel")
+                        }
+                        TextButton(onClick = { showMap = false }) {
+                            Text("Select Location")
+                        }
+                    }
                 }
             }
         }
