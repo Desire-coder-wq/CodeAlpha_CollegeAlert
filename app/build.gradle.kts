@@ -44,6 +44,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
     implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("com.rollbar:rollbar-android:1.12.0")
 
     // Jetpack Compose
     implementation(platform("androidx.compose:compose-bom:2026.04.01"))
@@ -68,18 +69,19 @@ dependencies {
 
     // Material Components
     implementation("com.google.android.material:material:1.12.0")
-    
-    // Maps
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("com.google.maps.android:maps-compose:4.3.0")
-    implementation("com.google.android.gms:play-services-location:21.1.0")
+
+    // Maps - FREE OPEN SOURCE (No API Key Needed!)
+    implementation("org.osmdroid:osmdroid-android:6.1.14")
 
     // Image Loading
     implementation("io.coil-kt:coil-compose:2.6.0")
-    
+
     // QR Code
     implementation("com.google.zxing:core:3.5.3")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+
+    // Date/Time Picker
+    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.1.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

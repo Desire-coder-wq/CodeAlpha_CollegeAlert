@@ -8,18 +8,21 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import com.codealpha.collegealert.R
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(navController: NavHostController) {
 
     LaunchedEffect(Unit) {
-        delay(2800)
+        delay(3000)
         navController.navigate("home") {
             popUpTo("splash") { inclusive = true }
         }
@@ -32,32 +35,36 @@ fun SplashScreen(navController: NavHostController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(60.dp))
 
+        // Challenge Alert Logo
         Box(
-            modifier = Modifier
-                .size(120.dp)
-                .background(Color(0xFFFF9800), shape = androidx.compose.foundation.shape.CircleShape),
+            modifier = Modifier.size(140.dp),
             contentAlignment = Alignment.Center
         ) {
-            Text(text = "📢", fontSize = 48.sp)
+            AsyncImage(
+                model = com.codealpha.collegealert.R.drawable.ic_challenge_alert_logo,
+                contentDescription = "Challenge Alert Logo",
+                modifier = Modifier.fillMaxSize()
+            )
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Campus Sentinel",
+            text = "CHALLENGE ALERT",
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            letterSpacing = 2.sp
         )
 
         Text(
-            text = "ACADEMIC VIGILANCE & SAFETY",
+            text = "CAMPUS VIGILANCE & SAFETY",
             fontSize = 14.sp,
             color = Color(0xFF94A3B8),
-            letterSpacing = 3.sp,
+            letterSpacing = 2.sp,
             modifier = Modifier.padding(top = 8.dp)
         )
 
@@ -67,6 +74,16 @@ fun SplashScreen(navController: NavHostController) {
             text = "Stay Informed • Stay Safe",
             fontSize = 16.sp,
             color = Color(0xFF64748B)
+        )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Loading indicator
+        Text(
+            text = "Loading...",
+            fontSize = 12.sp,
+            color = Color.Gray,
+            modifier = Modifier.padding(bottom = 40.dp)
         )
     }
 }

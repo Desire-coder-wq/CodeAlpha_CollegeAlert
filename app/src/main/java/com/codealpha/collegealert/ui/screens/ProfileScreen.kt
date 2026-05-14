@@ -1,5 +1,9 @@
 package com.codealpha.collegealert.ui.screens
 
+import android.net.Uri
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -17,10 +21,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.codealpha.collegealert.viewmodel.AuthViewModel
 
 @Composable
@@ -30,6 +37,14 @@ fun ProfileScreen(
 ) {
     val userProfile by viewModel.userProfile
     val isLoading by viewModel.isLoading
+    val context = LocalContext.current
+
+    // Image Picker Launcher
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.uploadProfilePicture(it) }
+    }
 
     Column(
         modifier = Modifier
@@ -59,8 +74,17 @@ fun ProfileScreen(
                         modifier = Modifier.size(100.dp).clip(CircleShape),
                         color = Color(0xFF1A237E)
                     ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Text("👤", fontSize = 48.sp)
+                        if (userProfile?.profilePictureUrl != null) {
+                            AsyncImage(
+                                model = userProfile?.profilePictureUrl,
+                                contentDescription = "Profile Picture",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        } else {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text("👤", fontSize = 48.sp)
+                            }
                         }
                     }
                     Surface(
@@ -68,8 +92,8 @@ fun ProfileScreen(
                         shape = CircleShape,
                         color = Color(0xFFFF9800)
                     ) {
-                        IconButton(onClick = { /* TODO: Implement Image Picker */ }) {
-                            Icon(Icons.Default.Edit, contentDescription = null, tint = Color.White, modifier = Modifier.padding(6.dp))
+                        IconButton(onClick = { launcher.launch("image/*") }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Change Picture", tint = Color.White, modifier = Modifier.padding(6.dp))
                         }
                     }
                 }
@@ -99,7 +123,7 @@ fun ProfileScreen(
                 if (userProfile?.isAdmin == true) {
                     Spacer(modifier = Modifier.height(8.dp))
                     SuggestionChip(
-                        onClick = { /* This is handled via the FAB on dashboard but can add here too */ },
+                        onClick = { /* Handle Admin Mode navigation if needed */ },
                         label = { Text("Administrator Mode") },
                         colors = SuggestionChipDefaults.suggestionChipColors(labelColor = Color(0xFFFF9800))
                     )
@@ -125,11 +149,24 @@ fun ProfileScreen(
                     userProfile?.let { viewModel.updateProfile(it.copy(festsNotificationsEnabled = enabled)) }
                 }
             )
+            NotificationToggle(
+                title = "Security & Safety Alerts",
+                subtitle = "Real-time campus broadcasts",
+                checked = userProfile?.securityAlertsEnabled ?: true,
+                onCheckedChange = { enabled ->
+                    userProfile?.let { viewModel.updateProfile(it.copy(securityAlertsEnabled = enabled)) }
+                }
+            )
         }
 
         ProfileSection(title = "Account Settings") {
             SettingItem(Icons.Default.Lock, "Privacy & Security", "Manage your data")
             SettingItem(Icons.Default.Language, "App Language", "English (US)")
+        }
+
+        ProfileSection(title = "Support") {
+            SettingItem(Icons.AutoMirrored.Filled.Help, "Help Center", "Get assistance")
+            SettingItem(Icons.Default.Info, "About Challenge Alert", "Version 1.0.0")
         }
 
         Spacer(modifier = Modifier.height(24.dp))

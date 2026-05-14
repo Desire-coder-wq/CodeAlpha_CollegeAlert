@@ -1,14 +1,18 @@
 package com.codealpha.collegealert.data.repository
 
+import android.net.Uri
 import com.codealpha.collegealert.data.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
+import java.util.UUID
 
 class AuthRepository(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance(),
-    private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
+    private val storage: FirebaseStorage = FirebaseStorage.getInstance()
 ) {
 
     fun getCurrentUser(): FirebaseUser? = auth.currentUser
@@ -55,6 +59,22 @@ class AuthRepository(
         return try {
             db.collection("users").document(user.uid).set(user).await()
             Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun uploadProfilePicture(uri: Uri): Result<String> {
+        return try {
+            val uid = auth.currentUser?.uid ?: throw Exception("Not logged in")
+            val ref = storage.reference.child("profiles/$uid.jpg")
+            ref.putFile(uri).await()
+            val url = ref.downloadUrl.await().toString()
+            
+            // Update Firestore with the new URL
+            db.collection("users").document(uid).update("profilePictureUrl", url).await()
+            
+            Result.success(url)
         } catch (e: Exception) {
             Result.failure(e)
         }

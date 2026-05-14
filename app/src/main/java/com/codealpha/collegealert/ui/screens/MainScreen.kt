@@ -85,10 +85,9 @@ fun MainScreen(
                         onClick = {
                             navController.navigate(screen.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                                    // Removed properties causing build issues in some versions
                                 }
                                 launchSingleTop = true
-                                restoreState = true
                             }
                         },
                         colors = NavigationBarItemDefaults.colors(
@@ -116,7 +115,8 @@ fun MainScreen(
             }
             composable(Screen.Alerts.route) {
                 AlertsScreen(
-                    onEventClick = onEventClick
+                    onEventClick = onEventClick,
+                    authViewModel = authViewModel
                 )
             }
             composable(Screen.Discover.route) {

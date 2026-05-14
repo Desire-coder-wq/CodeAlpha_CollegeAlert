@@ -17,10 +17,15 @@ import com.codealpha.collegealert.ui.screens.*
 import com.codealpha.collegealert.ui.theme.CollegeAlertTheme
 import com.codealpha.collegealert.viewmodel.AuthViewModel
 import com.codealpha.collegealert.viewmodel.EventViewModel
+import com.rollbar.android.Rollbar
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Initialize Rollbar for error tracking
+        Rollbar.init(this)
+        
         setContent {
             CollegeAlertTheme {
                 Surface(
@@ -68,8 +73,8 @@ fun AppNavigation() {
         composable("signup") {
             SignUpScreen(
                 onSignUpSuccess = {
-                    // SPEED OPTIMIZATION: Go directly to dashboard after signup
-                    Toast.makeText(context, "Account created! Welcome to Sentinel.", Toast.LENGTH_LONG).show()
+                    // Success message
+                    Toast.makeText(context, "Account created! Welcome to Challenge Alert.", Toast.LENGTH_LONG).show()
                     navController.navigate("main") {
                         popUpTo("home") { inclusive = true }
                     }

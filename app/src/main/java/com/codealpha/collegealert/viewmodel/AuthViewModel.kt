@@ -1,5 +1,6 @@
 package com.codealpha.collegealert.viewmodel
 
+import android.net.Uri
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -41,7 +42,6 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
             result.onSuccess { firebaseUser ->
                 _user.value = firebaseUser
                 if (firebaseUser != null) {
-                    // Wait for profile to load so Admin status is known immediately
                     val profile = repository.getUserProfile(firebaseUser.uid)
                     _userProfile.value = profile
                 }
@@ -62,7 +62,6 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
             result.onSuccess { firebaseUser ->
                 _user.value = firebaseUser
                 if (firebaseUser != null) {
-                    // Set profile immediately in memory to avoid extra network call
                     _userProfile.value = User(
                         uid = firebaseUser.uid,
                         fullName = fullName,
@@ -89,6 +88,20 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
                 _isLoading.value = false
             }.onFailure {
                 _error.value = "Failed to update profile"
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun uploadProfilePicture(uri: Uri) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            val result = repository.uploadProfilePicture(uri)
+            result.onSuccess { url ->
+                _userProfile.value = _userProfile.value?.copy(profilePictureUrl = url)
+                _isLoading.value = false
+            }.onFailure {
+                _error.value = "Failed to upload image"
                 _isLoading.value = false
             }
         }

@@ -19,6 +19,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
+import com.codealpha.collegealert.R
 import com.codealpha.collegealert.viewmodel.AuthViewModel
 
 @Composable
@@ -30,7 +32,7 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
-    
+
     val context = LocalContext.current
     val isLoading by viewModel.isLoading
     val error by viewModel.error
@@ -58,22 +60,24 @@ fun LoginScreen(
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(60.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
-        Surface(
-            modifier = Modifier.size(64.dp),
-            shape = RoundedCornerShape(12.dp),
-            color = Color(0xFF1A237E)
+        // Logo
+        Box(
+            modifier = Modifier.size(80.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Box(contentAlignment = Alignment.Center) {
-                Text("🛡️", fontSize = 32.sp)
-            }
+            AsyncImage(
+                model = R.drawable.ic_challenge_alert_logo,
+                contentDescription = "Challenge Alert Logo",
+                modifier = Modifier.fillMaxSize()
+            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Campus Sentinel",
+            text = "Challenge Alert",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF1A237E)
@@ -93,12 +97,18 @@ fun LoginScreen(
                     value = email,
                     onValueChange = { email = it },
                     placeholder = { Text("alex@university.edu", color = Color.LightGray) },
-                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
                     isError = email.isNotEmpty() && !isEmailValid,
                     singleLine = true,
                     colors = textFieldColors
                 )
+
+                if (email.isNotEmpty() && !isEmailValid) {
+                    Text("Invalid email format", color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+                }
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -107,7 +117,9 @@ fun LoginScreen(
                     value = password,
                     onValueChange = { password = it },
                     placeholder = { Text("••••••••", color = Color.LightGray) },
-                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
                     shape = RoundedCornerShape(8.dp),
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
@@ -120,27 +132,33 @@ fun LoginScreen(
                     colors = textFieldColors
                 )
 
+                if (password.isNotEmpty() && !isPasswordValid) {
+                    Text("Password must be at least 6 characters", color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+                }
+
                 if (error != null) {
-                    Text(text = error!!, color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(top = 8.dp))
+                    Text(text = "❌ ${error!!}", color = Color.Red, fontSize = 12.sp, modifier = Modifier.padding(top = 12.dp))
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
-                    onClick = { 
+                    onClick = {
                         if (isEmailValid && isPasswordValid) {
                             viewModel.signIn(email, password) {
                                 Toast.makeText(context, "Welcome back!", Toast.LENGTH_SHORT).show()
                                 onLoginSuccess()
                             }
                         } else {
-                            Toast.makeText(context, "Check email/password format", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Please check email and password", Toast.LENGTH_SHORT).show()
                         }
                     },
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF000051)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1A237E)),
                     shape = RoundedCornerShape(8.dp),
-                    enabled = !isLoading
+                    enabled = !isLoading && (isEmailValid && isPasswordValid)
                 ) {
                     if (isLoading) {
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
