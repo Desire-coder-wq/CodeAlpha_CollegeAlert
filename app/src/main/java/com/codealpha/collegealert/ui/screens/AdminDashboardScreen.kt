@@ -50,17 +50,17 @@ fun AdminDashboardScreen(
             item {
                 Text("QUICK STATS", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     StatCard("Total Events", "124", "↑ 12%", Modifier.weight(1f))
                     StatCard("Active Users", "2.4K", "↑ 8%", Modifier.weight(1f))
                 }
-                
+
                 Spacer(modifier = Modifier.height(24.dp))
-                
+
                 Text("ADMIN ACTIONS", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -69,17 +69,21 @@ fun AdminDashboardScreen(
                     Column(modifier = Modifier.padding(16.dp)) {
                         AdminActionItem(Icons.Default.AddBox, "Create New Event", "Publish to students", onAddNewEvent)
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                        AdminActionItem(Icons.Default.Campaign, "Send Broadcast", "Push emergency alert") {}
+                        AdminActionItem(Icons.Default.Campaign, "Send Broadcast", "Push emergency alert") {
+                            // TODO: Implement broadcast functionality
+                        }
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                        AdminActionItem(Icons.Default.BarChart, "View Analytics", "Check engagement rates") {}
+                        AdminActionItem(Icons.Default.BarChart, "View Analytics", "Check engagement rates") {
+                            // TODO: Implement analytics functionality
+                        }
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(24.dp))
-                
+
                 Text("ATTENDANCE TREND", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 Card(
                     modifier = Modifier.fillMaxWidth().height(200.dp),
                     colors = CardDefaults.cardColors(containerColor = Color(0xFF1A237E)),

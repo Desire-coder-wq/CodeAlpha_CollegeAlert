@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,11 +20,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.AsyncImage
 import com.codealpha.collegealert.data.model.Event
 import com.codealpha.collegealert.viewmodel.AuthViewModel
 import com.codealpha.collegealert.viewmodel.EventViewModel
@@ -41,13 +44,14 @@ fun AddEventScreen(
     var category by remember { mutableStateOf("Notice") }
     var venue by remember { mutableStateOf("") }
     var time by remember { mutableStateOf("") }
-    
+    var date by remember { mutableStateOf("") }
+
     // Extensible Features State
     var selectedUri by remember { mutableStateOf<Uri?>(null) }
     var attachmentType by remember { mutableStateOf<String?>(null) }
     var latitude by remember { mutableStateOf<Double?>(null) }
     var longitude by remember { mutableStateOf<Double?>(null) }
-    
+
     val context = LocalContext.current
     val userProfile by authViewModel.userProfile
     val createSuccess by eventViewModel.createEventSuccess
@@ -57,7 +61,7 @@ fun AddEventScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         selectedUri = uri
-        attachmentType = "image" // Defaulting to image for simplicity, can be dynamic
+        attachmentType = "image"
     }
 
     val inputColors = OutlinedTextFieldDefaults.colors(
@@ -75,6 +79,17 @@ fun AddEventScreen(
             eventViewModel.resetCreateSuccess()
             onBackClick()
         }
+    }
+
+    // Only allow admins to create events
+    if (userProfile?.isAdmin != true) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("Only administrators can create alerts.", color = Color.Red, fontWeight = FontWeight.Bold)
+        }
+        return
     }
 
     Scaffold(
@@ -103,7 +118,7 @@ fun AddEventScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             Text("ALERT DETAILS", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
-            
+
             OutlinedTextField(
                 value = title,
                 onValueChange = { title = it },
@@ -127,24 +142,34 @@ fun AddEventScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text("EXTensible FEATURES", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
-            Spacer(modifier = Modifier.height(8.dp))
-            
+            // Image Preview
+            if (selectedUri != null) {
+                AsyncImage(
+                    model = selectedUri,
+                    contentDescription = "Selected Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .padding(bottom = 8.dp),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 Button(
-                    onClick = { launcher.launch("*/*") },
+                    onClick = { launcher.launch("image/*") },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE8EAF6), contentColor = Color(0xFF1A237E)),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Icon(Icons.Default.AttachFile, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(if (selectedUri != null) "File Selected" else "Add File")
+                    Text(if (selectedUri != null) "Image Selected" else "Add Image")
                 }
-                
+
                 Button(
-                    onClick = { 
-                        // Mocking location selection
+                    onClick = {
+                        // For demonstration, set a static location (Kampala, Uganda)
                         latitude = 0.3476
                         longitude = 32.5825
                         Toast.makeText(context, "Location tagged!", Toast.LENGTH_SHORT).show()
@@ -161,10 +186,11 @@ fun AddEventScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Category Dropdown
             Text("CATEGORY", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
             val categories = listOf("Notice", "Exam", "Fest", "Seminar")
             var expanded by remember { mutableStateOf(false) }
-            
+
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded },
@@ -199,26 +225,40 @@ fun AddEventScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                OutlinedTextField(
-                    value = time,
-                    onValueChange = { time = it },
-                    label = { Text("Time") },
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = inputColors,
-                    singleLine = true
-                )
-                OutlinedTextField(
-                    value = venue,
-                    onValueChange = { venue = it },
-                    label = { Text("Venue") },
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = inputColors,
-                    singleLine = true
-                )
-            }
+            // Date and Time (simple text fields for now, can be replaced with pickers)
+            OutlinedTextField(
+                value = date,
+                onValueChange = { date = it },
+                label = { Text("Date (e.g. 2026-05-15)") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                colors = inputColors,
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = time,
+                onValueChange = { time = it },
+                label = { Text("Time (e.g. 14:00)") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                colors = inputColors,
+                singleLine = true
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = venue,
+                onValueChange = { venue = it },
+                label = { Text("Venue") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                colors = inputColors,
+                singleLine = true
+            )
 
             Spacer(modifier = Modifier.height(32.dp))
 
