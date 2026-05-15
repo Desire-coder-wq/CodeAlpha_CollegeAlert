@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Initialize Rollbar for error tracking
+        // Initialize Rollbar for professional error tracking
         Rollbar.init(this)
         
         setContent {
@@ -73,8 +73,8 @@ fun AppNavigation() {
         composable("signup") {
             SignUpScreen(
                 onSignUpSuccess = {
-                    // Success message
-                    Toast.makeText(context, "Account created! Welcome to Challenge Alert.", Toast.LENGTH_LONG).show()
+                    // SPEED OPTIMIZATION: Immediate welcome and redirect
+                    Toast.makeText(context, "Welcome to Challenge Alert!", Toast.LENGTH_LONG).show()
                     navController.navigate("main") {
                         popUpTo("home") { inclusive = true }
                     }

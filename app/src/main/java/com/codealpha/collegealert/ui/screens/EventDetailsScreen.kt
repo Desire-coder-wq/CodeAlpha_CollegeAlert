@@ -15,15 +15,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.codealpha.collegealert.data.model.Event
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventDetailsScreen(
-    event: Event, // Now taking the actual event object
+    event: Event,
     onBackClick: () -> Unit
 ) {
     Scaffold(
@@ -58,19 +60,24 @@ fun EventDetailsScreen(
                     .background(Color.DarkGray)
             ) {
                 if (event.attachmentUrl != null) {
-                    // In a real app, use Coil here to load the URL
-                    Text("📷 Attachment Loaded", modifier = Modifier.align(Alignment.Center), color = Color.White)
-                } else {
-                    Text(
-                        text = "📢 ${event.category.uppercase()}",
-                        modifier = Modifier.align(Alignment.Center),
-                        color = Color.White,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
+                    AsyncImage(
+                        model = event.attachmentUrl,
+                        contentDescription = "Attachment",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
                     )
+                } else {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = "📢 ${event.category.uppercase()}",
+                            color = Color.White,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
 
-                // Tag
+                // Category Tag
                 Surface(
                     modifier = Modifier.padding(16.dp).align(Alignment.TopStart),
                     shape = RoundedCornerShape(20.dp),
@@ -97,7 +104,7 @@ fun EventDetailsScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Info Rows
-                InfoRow(icon = Icons.Default.CalendarToday, label = "Date", value = "Upcoming")
+                InfoRow(icon = Icons.Default.CalendarToday, label = "Date", value = "Upcoming Event")
                 InfoRow(icon = Icons.Default.AccessTime, label = "Time", value = event.time)
                 InfoRow(icon = Icons.Default.LocationOn, label = "Venue", value = event.venue)
 
@@ -122,8 +129,9 @@ fun EventDetailsScreen(
                     colors = CardDefaults.cardColors(containerColor = Color(0xFFECEFF1))
                 ) {
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                        if (event.latitude != null) {
-                            Text("📍 Map View [${event.latitude}, ${event.longitude}]", color = Color(0xFF1A237E))
+                        if (event.latitude != null && event.longitude != null) {
+                            Text("📍 Location: ${event.latitude}, ${event.longitude}", color = Color(0xFF1A237E))
+                            // Map logic handled by clicking or external map app launch
                         } else {
                             Text("No location tagged for this alert", color = Color.Gray)
                         }
