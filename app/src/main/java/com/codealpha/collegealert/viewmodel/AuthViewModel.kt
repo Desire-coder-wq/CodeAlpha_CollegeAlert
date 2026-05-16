@@ -7,6 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.codealpha.collegealert.data.model.User
 import com.codealpha.collegealert.data.repository.AuthRepository
+import com.codealpha.collegealert.util.Logger
+import androidx.compose.ui.platform.LocalContext
+import android.content.Context
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 
@@ -38,16 +41,23 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
+            // Log start of sign-in
+            try {
+                Logger.log(null, "Auth", "Attempting signIn for $email")
+            } catch (_: Exception) {}
             val result = repository.signIn(email, pass)
             result.onSuccess { firebaseUser ->
                 _user.value = firebaseUser
                 if (firebaseUser != null) {
+                    // Fetch authoritative profile from Firestore to ensure isAdmin and other fields are up-to-date
                     val profile = repository.getUserProfile(firebaseUser.uid)
                     _userProfile.value = profile
+                    try { Logger.log(null, "Auth", "Fetched profile for ${firebaseUser.uid} isAdmin=${profile?.isAdmin}") } catch (_: Exception) {}
                 }
                 _isLoading.value = false
                 onSuccess()
             }.onFailure {
+                try { Logger.log(null, "Auth", "signIn failed: ${it.message}") } catch (_: Exception) {}
                 _error.value = it.message
                 _isLoading.value = false
             }
@@ -58,21 +68,20 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
+            try { Logger.log(null, "Auth", "Attempting signUp for $email isAdmin=$isAdmin") } catch (_: Exception) {}
             val result = repository.signUp(fullName, email, pass, collegeId, isAdmin)
             result.onSuccess { firebaseUser ->
                 _user.value = firebaseUser
                 if (firebaseUser != null) {
-                    _userProfile.value = User(
-                        uid = firebaseUser.uid,
-                        fullName = fullName,
-                        email = email,
-                        collegeId = collegeId,
-                        isAdmin = isAdmin
-                    )
+                    // After creating the auth user, fetch the saved Firestore profile to ensure consistency
+                    val profile = repository.getUserProfile(firebaseUser.uid)
+                    _userProfile.value = profile
+                    try { Logger.log(null, "Auth", "Created profile for ${firebaseUser.uid} isAdmin=${profile?.isAdmin}") } catch (_: Exception) {}
                 }
                 _isLoading.value = false
                 onSuccess()
             }.onFailure {
+                try { Logger.log(null, "Auth", "signUp failed: ${it.message}") } catch (_: Exception) {}
                 _error.value = it.message
                 _isLoading.value = false
             }

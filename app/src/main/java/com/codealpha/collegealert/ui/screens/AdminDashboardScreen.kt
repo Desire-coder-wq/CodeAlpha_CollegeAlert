@@ -10,6 +10,9 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.codealpha.collegealert.viewmodel.AuthViewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,8 +24,46 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun AdminDashboardScreen(
     onBackClick: () -> Unit,
-    onAddNewEvent: () -> Unit
+    onAddNewEvent: () -> Unit,
+    authViewModel: AuthViewModel = viewModel()
 ) {
+    val userProfile by authViewModel.userProfile
+    val isLoading by authViewModel.isLoading
+
+    // Prevent showing the admin panel to non-admins and handle loading state
+    if (isLoading && userProfile == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = Color(0xFF1A237E))
+        }
+        return
+    }
+
+    if (userProfile?.isAdmin != true) {
+        // Not an admin - show message and back button
+        Scaffold(topBar = {
+            TopAppBar(
+                title = { Text("Admin Control Panel") },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }) { padding ->
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(padding), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Access denied", color = Color.Red, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Your account does not have administrator privileges.")
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = onBackClick) { Text("Go Back") }
+                }
+            }
+        }
+        return
+    }
     Scaffold(
         topBar = {
             TopAppBar(

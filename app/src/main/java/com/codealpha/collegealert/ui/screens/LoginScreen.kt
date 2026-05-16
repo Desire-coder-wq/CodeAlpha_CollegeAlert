@@ -22,6 +22,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.codealpha.collegealert.R
 import com.codealpha.collegealert.viewmodel.AuthViewModel
+import com.codealpha.collegealert.util.Logger
 
 @Composable
 fun LoginScreen(
@@ -145,10 +146,12 @@ fun LoginScreen(
                 Button(
                     onClick = {
                         if (isEmailValid && isPasswordValid) {
-                            viewModel.signIn(email, password) {
-                                Toast.makeText(context, "Welcome back!", Toast.LENGTH_SHORT).show()
-                                onLoginSuccess()
-                            }
+                                try { Logger.log(context, "LoginScreen", "Sign in pressed for $email") } catch (_: Exception) {}
+                                viewModel.signIn(email, password) {
+                                    try { Logger.log(context, "LoginScreen", "Sign in success for $email") } catch (_: Exception) {}
+                                    Toast.makeText(context, "Welcome back!", Toast.LENGTH_SHORT).show()
+                                    onLoginSuccess()
+                                }
                         } else {
                             Toast.makeText(context, "Please check email and password", Toast.LENGTH_SHORT).show()
                         }

@@ -11,6 +11,9 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 
 @Composable
 fun MapPicker(
@@ -20,11 +23,14 @@ fun MapPicker(
     onLocationPicked: (lat: Double, lon: Double) -> Unit
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     AndroidView(
         modifier = modifier,
         factory = { ctx ->
+            // Ensure osmdroid knows our app's user agent (some tile servers block unknown agents)
             Configuration.getInstance().load(ctx, ctx.getSharedPreferences("osmdroid", Context.MODE_PRIVATE))
+            Configuration.getInstance().userAgentValue = ctx.packageName
             val map = MapView(ctx).apply {
                 setTileSource(TileSourceFactory.MAPNIK)
                 setMultiTouchControls(true)
@@ -52,7 +58,19 @@ fun MapPicker(
                 false
             }
 
+            // Hook lifecycle so map can pause/resume correctly
+            val lifecycleObserver = LifecycleEventObserver { _, event ->
+                when (event) {
+                    Lifecycle.Event.ON_RESUME -> map.onResume()
+                    Lifecycle.Event.ON_PAUSE -> map.onPause()
+                    else -> {}
+                }
+            }
+            lifecycleOwner.lifecycle.addObserver(lifecycleObserver)
+
             map
         }
     )
+
+    // Note: lifecycle observer is attached to the lifecycleOwner; no further cleanup required here.
 }

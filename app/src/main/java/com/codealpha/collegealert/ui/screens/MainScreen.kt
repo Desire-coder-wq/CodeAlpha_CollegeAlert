@@ -2,6 +2,9 @@ package com.codealpha.collegealert.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Dashboard
@@ -22,6 +25,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.codealpha.collegealert.data.model.Event
 import com.codealpha.collegealert.viewmodel.AuthViewModel
+import com.codealpha.collegealert.util.Logger
+import androidx.compose.ui.platform.LocalContext
 
 sealed class Screen(val route: String, val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
     object Home : Screen("dashboard_home", "Home", Icons.Default.GridView)
@@ -39,6 +44,8 @@ fun MainScreen(
     authViewModel: AuthViewModel
 ) {
     val navController = rememberNavController()
+    val context = LocalContext.current
+    try { Logger.log(context, "MainScreen", "Composed MainScreen; userProfile isAdmin=${authViewModel.userProfile.value?.isAdmin}") } catch (_: Exception) {}
     val items = listOf(
         Screen.Home,
         Screen.Alerts,
@@ -128,6 +135,17 @@ fun MainScreen(
                     onLogout = onLogout,
                     viewModel = authViewModel
                 )
+            }
+        }
+        // Debug overlay: shows whether profile has loaded and admin status
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.BottomEnd) {
+            androidx.compose.material3.Surface(
+                color = Color.White.copy(alpha = 0.6f),
+                modifier = Modifier.wrapContentSize().padding(8.dp),
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+            ) {
+                val statusText = "admin=${userProfile?.isAdmin} loaded=${userProfile != null}"
+                androidx.compose.material3.Text(text = statusText, modifier = Modifier.padding(6.dp), color = Color.Black)
             }
         }
     }

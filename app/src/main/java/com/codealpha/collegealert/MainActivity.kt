@@ -2,6 +2,12 @@ package com.codealpha.collegealert
 
 import android.os.Bundle
 import android.widget.Toast
+import android.os.Handler
+import android.os.Looper
+import java.io.PrintWriter
+import java.io.StringWriter
+import java.io.File
+import java.util.Date
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,18 +20,48 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.codealpha.collegealert.ui.screens.*
+import com.codealpha.collegealert.util.Logger
+import android.util.Log
 import com.codealpha.collegealert.ui.theme.CollegeAlertTheme
 import com.codealpha.collegealert.viewmodel.AuthViewModel
 import com.codealpha.collegealert.viewmodel.EventViewModel
-import com.rollbar.android.Rollbar
+// Rollbar dependency removed to avoid build issues on machines without the artifact
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Initialize Rollbar for professional error tracking
-        Rollbar.init(this)
-        
+        // Install a default uncaught exception handler to capture crashes to a local file
+        val priorHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            try {
+                val sw = StringWriter()
+                val pw = PrintWriter(sw)
+                throwable.printStackTrace(pw)
+                val trace = sw.toString()
+                try {
+                    val f = File(filesDir, "crash_log.txt")
+                    f.appendText("--- Crash at: ${Date()} ---\n")
+                    f.appendText(trace)
+                    f.appendText("\n\n")
+                } catch (io: Exception) {
+                    // ignore file write failures
+                }
+                // notify user on main thread
+                Handler(Looper.getMainLooper()).post {
+                    try {
+                        Toast.makeText(this, "App crashed: ${throwable.message}", Toast.LENGTH_LONG).show()
+                    } catch (_: Exception) {
+                    }
+                }
+            } catch (_: Exception) {
+            }
+            // delegate to previous handler
+            priorHandler?.uncaughtException(thread, throwable)
+        }
+
+        // (Optional) Initialize external error tracking here if available. Skipped in this build.
+
         setContent {
             CollegeAlertTheme {
                 Surface(
@@ -57,10 +93,18 @@ fun AppNavigation() {
         }
 
         composable("login") {
-            LoginScreen(
+                LoginScreen(
                 onLoginSuccess = {
-                    navController.navigate("main") {
-                        popUpTo("home") { inclusive = true }
+                    try {
+                        // use the Compose LocalContext captured above rather than `this` (which inside a NavHost lambda is not an Android Context)
+                        Logger.log(context, "Navigation", "Navigating to main after login")
+                        navController.navigate("main") {
+                            popUpTo("home") { inclusive = true }
+                        }
+                    } catch (t: Throwable) {
+                        Logger.logException(context, "NavigationError", t)
+                        // show fallback toast and avoid crash
+                        try { Toast.makeText(context, "Navigation failed: ${t.message}", Toast.LENGTH_LONG).show() } catch (_: Exception) {}
                     }
                 },
                 onSignUpClick = {
@@ -75,8 +119,14 @@ fun AppNavigation() {
                 onSignUpSuccess = {
                     // SPEED OPTIMIZATION: Immediate welcome and redirect
                     Toast.makeText(context, "Welcome to Challenge Alert!", Toast.LENGTH_LONG).show()
-                    navController.navigate("main") {
-                        popUpTo("home") { inclusive = true }
+                    try {
+                        Logger.log(context, "Navigation", "Navigating to main after signup")
+                        navController.navigate("main") {
+                            popUpTo("home") { inclusive = true }
+                        }
+                    } catch (t: Throwable) {
+                        Logger.logException(context, "NavigationError", t)
+                        try { Toast.makeText(context, "Navigation failed: ${t.message}", Toast.LENGTH_LONG).show() } catch (_: Exception) {}
                     }
                 },
                 onBackToLogin = {
@@ -94,8 +144,15 @@ fun AppNavigation() {
                 },
                 onLogout = {
                     authViewModel.logout {
-                        navController.navigate("splash") {
-                            popUpTo(0) { inclusive = true }
+                        try {
+                            Logger.log(context, "Navigation", "Logging out and navigating to splash")
+                            navController.navigate("splash") {
+                                // use startDestinationId instead of numeric 0 which can crash
+                                popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                            }
+                        } catch (t: Throwable) {
+                            Logger.logException(context, "NavigationError", t)
+                            try { Toast.makeText(context, "Logout navigation failed: ${t.message}", Toast.LENGTH_LONG).show() } catch (_: Exception) {}
                         }
                     }
                 },
@@ -130,7 +187,8 @@ fun AppNavigation() {
         composable("adminDashboard") {
             AdminDashboardScreen(
                 onBackClick = { navController.popBackStack() },
-                onAddNewEvent = { navController.navigate("addEvent") }
+                onAddNewEvent = { navController.navigate("addEvent") },
+                authViewModel = authViewModel
             )
         }
     }

@@ -44,7 +44,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
     implementation("androidx.activity:activity-compose:1.9.3")
-    implementation("com.rollbar:rollbar-android:1.12.0")
+    // Rollbar removed - optional external crash reporting
 
     // Jetpack Compose
     implementation(platform("androidx.compose:compose-bom:2026.04.01"))
@@ -80,8 +80,7 @@ dependencies {
     implementation("com.google.zxing:core:3.5.3")
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 
-    // Date/Time Picker
-    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.1.0")
+    // Date/Time Picker (removed - add a compatible version if needed)
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")

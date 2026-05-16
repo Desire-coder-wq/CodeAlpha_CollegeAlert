@@ -178,7 +178,7 @@ fun SignUpScreen(
                     colors = textFieldColors
                 )
                 if (password.isNotEmpty() && !isPasswordValid) {
-                    Text("Password must be at least 6 characters", color = Color.Red, fontSize = 11.sp, modifier = Modifier.padding(top = 2.sp))
+                    Text("Password must be at least 6 characters", color = Color.Red, fontSize = 11.sp, modifier = Modifier.padding(top = 2.dp))
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
