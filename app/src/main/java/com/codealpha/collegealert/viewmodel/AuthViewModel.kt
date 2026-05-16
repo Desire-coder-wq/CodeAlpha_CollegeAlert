@@ -75,8 +75,20 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
                 if (firebaseUser != null) {
                     // After creating the auth user, fetch the saved Firestore profile to ensure consistency
                     val profile = repository.getUserProfile(firebaseUser.uid)
-                    _userProfile.value = profile
-                    try { Logger.log(null, "Auth", "Created profile for ${firebaseUser.uid} isAdmin=${profile?.isAdmin}") } catch (_: Exception) {}
+                    if (profile != null) {
+                        _userProfile.value = profile
+                        try { Logger.log(null, "Auth", "Created profile for ${firebaseUser.uid} isAdmin=${profile.isAdmin}") } catch (_: Exception) {}
+                    } else {
+                        // Firestore read may be blocked by rules or network. Use a best-effort local profile so admin UI appears immediately.
+                        _userProfile.value = com.codealpha.collegealert.data.model.User(
+                            uid = firebaseUser.uid,
+                            fullName = fullName,
+                            email = email,
+                            collegeId = collegeId,
+                            isAdmin = isAdmin
+                        )
+                        try { Logger.log(null, "Auth", "Firestore profile missing; using local fallback for ${firebaseUser.uid} isAdmin=$isAdmin") } catch (_: Exception) {}
+                    }
                 }
                 _isLoading.value = false
                 onSuccess()
@@ -94,9 +106,11 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
             val result = repository.updateUserProfile(updatedUser)
             result.onSuccess {
                 _userProfile.value = updatedUser
+                try { Logger.log(null, "Auth", "updateProfile success for ${updatedUser.uid} isAdmin=${updatedUser.isAdmin}") } catch (_: Exception) {}
                 _isLoading.value = false
             }.onFailure {
                 _error.value = "Failed to update profile"
+                try { Logger.log(null, "Auth", "updateProfile failed: ${it.message}") } catch (_: Exception) {}
                 _isLoading.value = false
             }
         }
@@ -121,5 +135,11 @@ class AuthViewModel(private val repository: AuthRepository = AuthRepository()) :
         _user.value = null
         _userProfile.value = null
         onLogout()
+    }
+
+    // Public helper to refresh the user profile from Firestore (useful after manual edits in console)
+    fun refreshProfile() {
+        val uid = _user.value?.uid
+        if (uid != null) fetchUserProfile(uid)
     }
 }

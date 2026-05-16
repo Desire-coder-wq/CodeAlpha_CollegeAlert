@@ -4,6 +4,8 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
+import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -62,6 +64,13 @@ fun AddEventScreen(
     ) { uri: Uri? ->
         selectedUri = uri
         attachmentType = "image" // Can be expanded to detect video/file
+    }
+
+    // Permission launcher for location (used by MapPicker)
+    val requestLocationLauncher = rememberLauncherForActivityResult(RequestPermission()) { granted ->
+        if (granted) {
+            showMap = true
+        }
     }
 
     val inputColors = OutlinedTextFieldDefaults.colors(
@@ -145,7 +154,15 @@ fun AddEventScreen(
                 }
                 
                 Button(
-                    onClick = { showMap = true },
+                    onClick = {
+                        val granted = ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                        if (granted) {
+                            showMap = true
+                        } else {
+                            // request permission
+                            requestLocationLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+                        }
+                    },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE8EAF6), contentColor = Color(0xFF1A237E)),
                     shape = RoundedCornerShape(8.dp)

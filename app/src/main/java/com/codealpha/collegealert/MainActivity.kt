@@ -25,6 +25,7 @@ import android.util.Log
 import com.codealpha.collegealert.ui.theme.CollegeAlertTheme
 import com.codealpha.collegealert.viewmodel.AuthViewModel
 import com.codealpha.collegealert.viewmodel.EventViewModel
+import com.google.firebase.messaging.FirebaseMessaging
 // Rollbar dependency removed to avoid build issues on machines without the artifact
 
 class MainActivity : ComponentActivity() {
@@ -70,6 +71,20 @@ class MainActivity : ComponentActivity() {
                     AppNavigation()
                 }
             }
+        }
+
+        // Request FCM token to enable push notifications and log it for debugging
+        try {
+            FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val token = task.result
+                    try { Logger.log(this, "FCM", "Token: $token") } catch (_: Exception) {}
+                } else {
+                    try { Logger.log(this, "FCM", "Token retrieval failed: ${task.exception?.message}") } catch (_: Exception) {}
+                }
+            }
+        } catch (e: Exception) {
+            // ignore if Firebase not configured
         }
     }
 }

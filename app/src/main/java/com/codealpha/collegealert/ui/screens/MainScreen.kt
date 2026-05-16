@@ -55,6 +55,14 @@ fun MainScreen(
     
     val userProfile by authViewModel.userProfile
 
+    // If the logged-in user is an admin, auto-redirect them to the admin dashboard
+    LaunchedEffect(userProfile?.isAdmin) {
+        if (userProfile?.isAdmin == true) {
+            try { Logger.log(context, "MainScreen", "Auto-redirecting admin to admin dashboard") } catch (_: Exception) {}
+            onAdminDashboardClick()
+        }
+    }
+
     Scaffold(
         floatingActionButton = {
             if (userProfile?.isAdmin == true) {

@@ -9,6 +9,8 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.codealpha.collegealert.util.Logger
+import android.util.Log
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -17,6 +19,11 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         // Here you would send the token to your server if needed
+        try {
+            Logger.log(applicationContext, "FCM", "New token: $token")
+        } catch (e: Exception) {
+            Log.d("CollegeAlert", "FCM token: $token")
+        }
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
