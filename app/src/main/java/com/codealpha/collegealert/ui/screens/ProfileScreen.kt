@@ -1,24 +1,3 @@
-
-PS C:\Users\DESIRE\AndroidStudioProjects\CollegeAlert> adb logcat -v time CollegeAlert:D *:S
---------- beginning of main
-05-16 14:11:50.070 D/CollegeAlert(11553): [Sat May 16 14:11:50 GMT+03:00 2026] LoginScreen: Sign in pressed for avukiblessingisaac@gmail.com
-05-16 14:11:50.078 D/CollegeAlert(11553): [Sat May 16 14:11:50 GMT+03:00 2026] Auth: Attempting signIn for avukiblessingisaac@gmail.com
-05-16 14:11:51.768 D/CollegeAlert(11553): [Sat May 16 14:11:51 GMT+03:00 2026] Auth: Fetched profile for PUkxNgP1aGYGth3qWGrR41Ytoly1 isAdmin=false
-05-16 14:11:51.768 D/CollegeAlert(11553): [Sat May 16 14:11:51 GMT+03:00 2026] LoginScreen: Sign in success for avukiblessingisaac@gmail.com
-05-16 14:11:51.866 D/CollegeAlert(11553): [Sat May 16 14:11:51 GMT+03:00 2026] Navigation: Navigating to main after login
-05-16 14:11:51.965 D/CollegeAlert(11553): [Sat May 16 14:11:51 GMT+03:00 2026] MainScreen: Composed MainScreen; userProfile isAdmin=false
-05-16 14:11:52.268 D/CollegeAlert(11553): [Sat May 16 14:11:52 GMT+03:00 2026] DashboardScreen: Composing Dashboard; userProfile=PUkxNgP1aGYGth3qWGrR41Ytoly1 isAdmin=false
-05-16 14:12:04.589 D/CollegeAlert(11553): [Sat May 16 14:12:04 GMT+03:00 2026] DashboardScreen: Composing Dashboard; userProfile=PUkxNgP1aGYGth3qWGrR41Ytoly1 isAdmin=false
-05-16 14:12:47.540 D/CollegeAlert(11553): [Sat May 16 14:12:47 GMT+03:00 2026] Navigation: Logging out and navigating to splash
-05-16 14:12:47.573 D/CollegeAlert(11553): [Sat May 16 14:12:47 GMT+03:00 2026] MainScreen: Composed MainScreen; userProfile isAdmin=null
-05-16 14:14:26.159 D/CollegeAlert(12507): [Sat May 16 14:14:26 GMT+03:00 2026] Auth: Attempting signUp for rimo@gmail.com isAdmin=true
-05-16 14:14:30.970 D/CollegeAlert(12507): [Sat May 16 14:14:30 GMT+03:00 2026] Auth: Created profile for yU1kUs6XPWNN9zMeKRobxLNpBRl2 isAdmin=false
-05-16 14:14:31.062 D/CollegeAlert(12507): [Sat May 16 14:14:31 GMT+03:00 2026] Navigation: Navigating to main after signup
-05-16 14:14:31.139 D/CollegeAlert(12507): [Sat May 16 14:14:31 GMT+03:00 2026] MainScreen: Composed MainScreen; userProfile isAdmin=false
-05-16 14:14:31.344 D/CollegeAlert(12507): [Sat May 16 14:14:31 GMT+03:00 2026] DashboardScreen: Composing Dashboard; userProfile=yU1kUs6XPWNN9zMeKRobxLNpBRl2 isAdmin=false
-05-16 14:15:06.619 D/CollegeAlert(12507): [Sat May 16 14:15:06 GMT+03:00 2026] DashboardScreen: Composing Dashboard; userProfile=yU1kUs6XPWNN9zMeKRobxLNpBRl2 isAdmin=false
-05-16 14:15:12.930 D/CollegeAlert(12507): [Sat May 16 14:15:12 GMT+03:00 2026] DashboardScreen: Composing Dashboard; userProfile=yU1kUs6XPWNN9zMeKRobxLNpBRl2 isAdmin=false
-
 package com.codealpha.collegealert.ui.screens
 
 import android.net.Uri

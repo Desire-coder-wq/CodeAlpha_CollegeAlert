@@ -19,16 +19,29 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.*
+import androidx.compose.runtime.setValue
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import androidx.compose.runtime.rememberCoroutineScope
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdminDashboardScreen(
     onBackClick: () -> Unit,
     onAddNewEvent: () -> Unit,
+    onViewAnalytics: () -> Unit = {},
     authViewModel: AuthViewModel = viewModel()
 ) {
     val userProfile by authViewModel.userProfile
     val isLoading by authViewModel.isLoading
+    val coroutineScope = rememberCoroutineScope()
+    val db = FirebaseFirestore.getInstance()
+    val context = LocalContext.current
+    var showBroadcastDialog by remember { mutableStateOf(false) }
 
     // Prevent showing the admin panel to non-admins and handle loading state
     if (isLoading && userProfile == null) {
@@ -38,14 +51,14 @@ fun AdminDashboardScreen(
         return
     }
 
-    if (userProfile?.isAdmin != true) {
+        if (userProfile?.isAdmin != true) {
         // Not an admin - show message and back button
         Scaffold(topBar = {
             TopAppBar(
                 title = { Text("Admin Control Panel") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -70,7 +83,7 @@ fun AdminDashboardScreen(
                 title = { Text("Admin Control Panel", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -109,14 +122,70 @@ fun AdminDashboardScreen(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         AdminActionItem(Icons.Default.AddBox, "Create New Event", "Publish to students", onAddNewEvent)
+                                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                                // Broadcast flow handled via a simple in-app dialog that saves a broadcast doc to Firestore
+                                if (showBroadcastDialog) {
+                                    var bTitle by remember { mutableStateOf("") }
+                                    var bMessage by remember { mutableStateOf("") }
+                                    AlertDialog(
+                                        onDismissRequest = { showBroadcastDialog = false },
+                                        title = { Text("Send Broadcast") },
+                                        text = {
+                                            Column {
+                                                OutlinedTextField(
+                                                    value = bTitle,
+                                                    onValueChange = { bTitle = it },
+                                                    label = { Text("Title") },
+                                                    singleLine = true
+                                                )
+                                                Spacer(modifier = Modifier.height(8.dp))
+                                                OutlinedTextField(
+                                                    value = bMessage,
+                                                    onValueChange = { bMessage = it },
+                                                    label = { Text("Message") }
+                                                )
+                                            }
+                                        },
+                                        confirmButton = {
+                                            TextButton(onClick = {
+                                                if (bTitle.isBlank() || bMessage.isBlank()) {
+                                                    Toast.makeText(context, "Please enter title and message", Toast.LENGTH_SHORT).show()
+                                                    return@TextButton
+                                                }
+                                                val uid = authViewModel.user.value?.uid ?: ""
+                                                val collegeId = authViewModel.userProfile.value?.collegeId ?: ""
+                                                coroutineScope.launch {
+                                                    try {
+                                                        val docRef = db.collection("broadcasts").document()
+                                                        val payload = mapOf(
+                                                            "id" to docRef.id,
+                                                            "title" to bTitle.trim(),
+                                                            "message" to bMessage.trim(),
+                                                            "collegeId" to collegeId,
+                                                            "createdBy" to uid,
+                                                            "createdAt" to com.google.firebase.Timestamp.now()
+                                                        )
+                                                        docRef.set(payload).await()
+                                                            Toast.makeText(context, "Broadcast saved", Toast.LENGTH_SHORT).show()
+                                                    } catch (e: Exception) {
+                                                                Toast.makeText(context, "Failed to send broadcast: ${e.message}", Toast.LENGTH_LONG).show()
+                                                    }
+                                                }
+                                                showBroadcastDialog = false
+                                            }) { Text("Send") }
+                                        },
+                                        dismissButton = {
+                                            TextButton(onClick = { showBroadcastDialog = false }) { Text("Cancel") }
+                                        }
+                                    )
+                                }
+                                AdminActionItem(Icons.Default.Campaign, "Send Broadcast", "Push emergency alert") {
+                                    showBroadcastDialog = true
+                                }
                         HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                        AdminActionItem(Icons.Default.Campaign, "Send Broadcast", "Push emergency alert") {
-                            // TODO: Implement broadcast functionality
-                        }
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-                        AdminActionItem(Icons.Default.BarChart, "View Analytics", "Check engagement rates") {
-                            // TODO: Implement analytics functionality
-                        }
+                                AdminActionItem(Icons.Default.BarChart, "View Analytics", "Check engagement rates") {
+                                    onViewAnalytics()
+                                }
                     }
                 }
 
@@ -138,6 +207,7 @@ fun AdminDashboardScreen(
         }
     }
 }
+
 
 @Composable
 fun StatCard(title: String, value: String, trend: String, modifier: Modifier) {
@@ -181,3 +251,5 @@ fun AdminActionItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title
         Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = Color.LightGray)
     }
 }
+
+// BroadcastDialog removed; inline dialog used to avoid forward-reference and ViewModel dependencies.

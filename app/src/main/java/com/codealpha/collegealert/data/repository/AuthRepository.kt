@@ -9,7 +9,6 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
 import com.google.firebase.firestore.Source
 import com.codealpha.collegealert.util.Logger
-import com.codealpha.collegealert.util.Logger
 import java.util.UUID
 
 class AuthRepository(

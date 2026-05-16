@@ -13,6 +13,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -152,6 +153,18 @@ fun AppNavigation() {
         }
 
         composable("main") {
+            // Ensure we auto-redirect to admin dashboard at the navigation level as a fallback
+            // (this makes the behavior robust even if the MainScreen's own LaunchedEffect misses a change)
+            val userProfile by authViewModel.userProfile
+            androidx.compose.runtime.LaunchedEffect(userProfile?.isAdmin) {
+                if (userProfile?.isAdmin == true) {
+                    try { Logger.log(context, "Navigation", "Auto-navigating to adminDashboard from AppNavigation") } catch (_: Exception) {}
+                    navController.navigate("adminDashboard") {
+                        popUpTo("main") { inclusive = true }
+                    }
+                }
+            }
+
             MainScreen(
                 onEventClick = { event ->
                     eventViewModel.selectEvent(event)
@@ -203,6 +216,14 @@ fun AppNavigation() {
             AdminDashboardScreen(
                 onBackClick = { navController.popBackStack() },
                 onAddNewEvent = { navController.navigate("addEvent") },
+                onViewAnalytics = { navController.navigate("analytics") },
+                authViewModel = authViewModel
+            )
+        }
+
+        composable("analytics") {
+            AnalyticsScreen(
+                onBackClick = { navController.popBackStack() },
                 authViewModel = authViewModel
             )
         }
