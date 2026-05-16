@@ -32,7 +32,7 @@ fun AlertCard(event: Event, onClick: () -> Unit) {
         shape = RoundedCornerShape(12.dp)
     ) {
         Column {
-            // Media Attachment or Logo Placeholder
+            // Media Attachment or App Logo Placeholder
             if (event.attachmentUrl != null && event.attachmentType == "image") {
                 AsyncImage(
                     model = event.attachmentUrl,
@@ -49,7 +49,7 @@ fun AlertCard(event: Event, onClick: () -> Unit) {
                         .height(150.dp)
                         .background(Color(0xFFF1F5F9))
                 ) {
-                    // Show the Challenge Alert Logo if no image
+                    // Show the app logo if no image
                     Image(
                         painter = painterResource(id = R.drawable.ic_app_logo),
                         contentDescription = null,

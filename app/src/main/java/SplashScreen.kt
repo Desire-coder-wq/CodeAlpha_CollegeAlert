@@ -37,14 +37,14 @@ fun SplashScreen(navController: NavHostController) {
     ) {
         Spacer(modifier = Modifier.height(60.dp))
 
-        // Challenge Alert Logo
+        // App logo
         Box(
             modifier = Modifier.size(140.dp),
             contentAlignment = Alignment.Center
         ) {
             AsyncImage(
-                model = com.codealpha.collegealert.R.drawable.ic_challenge_alert_logo,
-                contentDescription = "Challenge Alert Logo",
+                model = com.codealpha.collegealert.R.drawable.ic_app_logo,
+                contentDescription = "App Logo",
                 modifier = Modifier.fillMaxSize()
             )
         }
@@ -52,7 +52,7 @@ fun SplashScreen(navController: NavHostController) {
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "CHALLENGE ALERT",
+            text = "COLLEGE ALERT",
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
             color = Color.White,

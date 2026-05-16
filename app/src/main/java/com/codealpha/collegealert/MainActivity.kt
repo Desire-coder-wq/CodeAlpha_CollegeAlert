@@ -126,6 +126,7 @@ fun AppNavigation() {
                 onSignUpClick = {
                     navController.navigate("signup")
                 },
+                onBack = { navController.popBackStack() },
                 viewModel = authViewModel
             )
         }
@@ -134,7 +135,7 @@ fun AppNavigation() {
             SignUpScreen(
                 onSignUpSuccess = {
                     // SPEED OPTIMIZATION: Immediate welcome and redirect
-                    Toast.makeText(context, "Welcome to Challenge Alert!", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Welcome to College Alert!", Toast.LENGTH_LONG).show()
                     try {
                         Logger.log(context, "Navigation", "Navigating to main after signup")
                         navController.navigate("main") {

@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -28,6 +29,7 @@ import com.codealpha.collegealert.util.Logger
 fun LoginScreen(
     onLoginSuccess: () -> Unit,
     onSignUpClick: () -> Unit,
+    onBack: () -> Unit = {},
     viewModel: AuthViewModel = viewModel()
 ) {
     var email by remember { mutableStateOf("") }
@@ -54,35 +56,47 @@ fun LoginScreen(
         errorTextColor = Color.Red
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF8F9FB))
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    androidx.compose.material3.Scaffold(topBar = {
+        TopAppBar(
+            title = { /* intentionally empty title to keep layout similar */ },
+            navigationIcon = {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+        )
+    }) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFF8F9FB))
+                .padding(24.dp)
+                .padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
         Spacer(modifier = Modifier.height(40.dp))
 
-        // Logo
+            // Logo
         Box(
             modifier = Modifier.size(80.dp),
             contentAlignment = Alignment.Center
         ) {
-            AsyncImage(
-                model = R.drawable.ic_challenge_alert_logo,
-                contentDescription = "Challenge Alert Logo",
-                modifier = Modifier.fillMaxSize()
-            )
+                AsyncImage(
+                    model = R.drawable.ic_app_logo,
+                    contentDescription = "App Logo",
+                    modifier = Modifier.fillMaxSize()
+                )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Text(
-            text = "Challenge Alert",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF1A237E)
-        )
+            Text(
+                text = "College Alert",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF1A237E)
+            )
 
         Spacer(modifier = Modifier.height(40.dp))
 

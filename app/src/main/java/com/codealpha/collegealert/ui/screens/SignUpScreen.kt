@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.verticalScroll
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import androidx.compose.material.icons.filled.ArrowBack
 import com.codealpha.collegealert.R
 import com.codealpha.collegealert.viewmodel.AuthViewModel
 
@@ -60,14 +61,26 @@ fun SignUpScreen(
         unfocusedLabelColor = Color.Gray
     )
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF8F9FB))
-            .padding(24.dp)
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    androidx.compose.material3.Scaffold(topBar = {
+        TopAppBar(
+            title = { /* empty title */ },
+            navigationIcon = {
+                IconButton(onClick = onBackToLogin) {
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                }
+            },
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent)
+        )
+    }) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFFF8F9FB))
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(innerPadding),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
         Spacer(modifier = Modifier.height(30.dp))
 
         // Logo
@@ -76,8 +89,8 @@ fun SignUpScreen(
             contentAlignment = Alignment.Center
         ) {
             AsyncImage(
-                model = R.drawable.ic_challenge_alert_logo,
-                contentDescription = "Challenge Alert Logo",
+                model = R.drawable.ic_app_logo,
+                contentDescription = "App Logo",
                 modifier = Modifier.fillMaxSize()
             )
         }
@@ -85,7 +98,7 @@ fun SignUpScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Join Challenge Alert",
+            text = "Join College Alert",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF1A237E)

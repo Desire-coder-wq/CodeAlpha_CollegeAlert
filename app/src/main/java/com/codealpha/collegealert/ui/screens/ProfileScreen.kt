@@ -182,7 +182,7 @@ fun ProfileScreen(
 
         ProfileSection(title = "Support") {
             SettingItem(Icons.AutoMirrored.Filled.Help, "Help Center", "Get assistance")
-            SettingItem(Icons.Default.Info, "About Challenge Alert", "Version 1.0.0")
+            SettingItem(Icons.Default.Info, "About College Alert", "Version 1.0.0")
         }
 
         Spacer(modifier = Modifier.height(24.dp))

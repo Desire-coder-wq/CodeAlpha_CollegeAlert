@@ -50,7 +50,7 @@ fun SplashScreen(navController: NavHostController) {
             // NEW LOGO IMPLEMENTATION
             Image(
                 painter = painterResource(id = R.drawable.ic_app_logo),
-                contentDescription = "Challenge Alert Logo",
+                contentDescription = "App Logo",
                 modifier = Modifier
                     .size(200.dp)
                     .padding(16.dp)
@@ -59,7 +59,7 @@ fun SplashScreen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "CHALLENGE ALERT",
+                text = "COLLEGE ALERT",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = Color.White,
